@@ -190,16 +190,22 @@ requestAnimationFrame(loop)})();
 const bg=document.getElementById('bgParticles');if(!bg)return;
 const bx=bg.getContext('2d');let BW,BH;const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 function bsize(){BW=bg.width=innerWidth;BH=bg.height=innerHeight}bsize();addEventListener('resize',bsize);
-const N=innerWidth<640?55:95;const bp=[];
-for(let i=0;i<N;i++)bp.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,r:Math.random()*2.2+1.2,hue:Math.random()<.22?'242,165,65':'21,96,130'});
+const N=innerWidth<640?55:95;const bp=[];const LIFE=15;
+function spawn(p){p.x=Math.random()*BW;p.y=Math.random()*BH;p.vx=(Math.random()-.5)*.35;p.vy=(Math.random()-.5)*.35;p.age=0;return p}
+for(let i=0;i<N;i++){const p=spawn({r:Math.random()*2.2+1.2,hue:Math.random()<.22?'242,165,65':'21,96,130'});p.age=Math.random()*LIFE;bp.push(p)}
 let mouse=null;
 addEventListener('pointermove',e=>{mouse={x:e.clientX,y:e.clientY}},{passive:true});
 addEventListener('pointerdown',e=>{mouse={x:e.clientX,y:e.clientY}},{passive:true});
 addEventListener('pointerleave',()=>mouse=null);
 document.addEventListener('mouseleave',()=>mouse=null);
-function bloop(){
+let lastT=performance.now();
+function bloop(now){
+ const dt=Math.min((now-lastT)/1000,.1);lastT=now;
  bx.clearRect(0,0,BW,BH);
  bp.forEach(p=>{
+  // 15 second life: fade out, vanish, respawn at a random position
+  p.age+=dt;if(p.age>=LIFE)spawn(p);
+  p.fade=Math.min(p.age/1.2,1)*Math.min((LIFE-p.age)/1.2,1);
   // gentle drift
   p.x+=p.vx;p.y+=p.vy;
   if(p.x<0||p.x>BW)p.vx*=-1;if(p.y<0||p.y>BH)p.vy*=-1;
@@ -211,7 +217,7 @@ function bloop(){
   // keep speeds calm
   p.vx*=.985;p.vy*=.985;
   const sp=Math.hypot(p.vx,p.vy);if(sp<.12){p.vx+= (Math.random()-.5)*.02;p.vy+=(Math.random()-.5)*.02}
-  bx.beginPath();bx.arc(p.x,p.y,p.r,0,7);bx.fillStyle='rgba('+p.hue+',.5)';bx.fill();
+  bx.beginPath();bx.arc(p.x,p.y,p.r,0,7);bx.fillStyle='rgba('+p.hue+','+(.5*p.fade)+')';bx.fill();
  });
  // faint links between near particles, stronger near the pointer
  for(let i=0;i<bp.length;i++)for(let j=i+1;j<bp.length;j++){
@@ -222,7 +228,7 @@ function bloop(){
  if(mouse&&!reduced){const g=bx.createRadialGradient(mouse.x,mouse.y,0,mouse.x,mouse.y,150);g.addColorStop(0,'rgba(242,165,65,.10)');g.addColorStop(1,'rgba(242,165,65,0)');bx.fillStyle=g;bx.fillRect(mouse.x-150,mouse.y-150,300,300)}
  requestAnimationFrame(bloop);
 }
-bloop();
+requestAnimationFrame(bloop);
 })();
 </script>
 </body>
