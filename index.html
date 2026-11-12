@@ -30,6 +30,9 @@ table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px 10px
 footer{margin-top:60px;background:var(--dark);color:#dce8ec;padding:30px 20px}footer a{color:#fff}
 .note{background:#fff8e8;border:1px solid #f0d48a;border-radius:12px;padding:16px 18px}
 /* --- animations --- */
+#bgParticles{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+body>*:not(#bgParticles){position:relative;z-index:1}
+nav{z-index:20}
 #progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:50}
 header{position:relative;overflow:hidden;background:linear-gradient(120deg,var(--dark),var(--main),#1d7ea3,var(--main));background-size:220% 220%;animation:heroShift 14s ease infinite}
 @keyframes heroShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
@@ -55,6 +58,7 @@ figure.card{overflow:hidden}
 </style>
 </head>
 <body>
+<canvas id="bgParticles" aria-hidden="true"></canvas>
 <div id="progress"></div>
 <header><canvas id="particles" aria-hidden="true"></canvas><div class="wrap">
 <div class="kicker">Portfolio / <span id="rotator">Computer Vision</span></div>
@@ -161,6 +165,45 @@ for(let i=0;i<55;i++)ps.push({x:Math.random(),y:Math.random(),vx:(Math.random()-
 (function loop(){ctx.clearRect(0,0,W,H);ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>1)p.vx*=-1;if(p.y<0||p.y>1)p.vy*=-1;ctx.beginPath();ctx.arc(p.x*W,p.y*H,p.r,0,7);ctx.fillStyle='rgba(255,255,255,.75)';ctx.fill()});
 for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++){const a=ps[i],b=ps[j],d=Math.hypot((a.x-b.x)*W,(a.y-b.y)*H);if(d<110){ctx.beginPath();ctx.moveTo(a.x*W,a.y*H);ctx.lineTo(b.x*W,b.y*H);ctx.strokeStyle='rgba(255,255,255,'+(0.16*(1-d/110))+')';ctx.stroke()}}
 requestAnimationFrame(loop)})();
+// body background particles that gather toward the pointer
+(function(){
+const bg=document.getElementById('bgParticles');if(!bg)return;
+const bx=bg.getContext('2d');let BW,BH;const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function bsize(){BW=bg.width=innerWidth;BH=bg.height=innerHeight}bsize();addEventListener('resize',bsize);
+const N=innerWidth<640?55:95;const bp=[];
+for(let i=0;i<N;i++)bp.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,r:Math.random()*2.2+1.2,hue:Math.random()<.22?'242,165,65':'21,96,130'});
+let mouse=null;
+addEventListener('pointermove',e=>{mouse={x:e.clientX,y:e.clientY}},{passive:true});
+addEventListener('pointerdown',e=>{mouse={x:e.clientX,y:e.clientY}},{passive:true});
+addEventListener('pointerleave',()=>mouse=null);
+document.addEventListener('mouseleave',()=>mouse=null);
+function bloop(){
+ bx.clearRect(0,0,BW,BH);
+ bp.forEach(p=>{
+  // gentle drift
+  p.x+=p.vx;p.y+=p.vy;
+  if(p.x<0||p.x>BW)p.vx*=-1;if(p.y<0||p.y>BH)p.vy*=-1;
+  if(mouse&&!reduced){
+   const dx=mouse.x-p.x,dy=mouse.y-p.y,d=Math.hypot(dx,dy);
+   if(d<230&&d>26){const f=(1-d/230)*.055;p.vx+=dx/d*f;p.vy+=dy/d*f}
+   else if(d<=26){p.vx-=dx/(d||1)*.02;p.vy-=dy/(d||1)*.02}
+  }
+  // keep speeds calm
+  p.vx*=.985;p.vy*=.985;
+  const sp=Math.hypot(p.vx,p.vy);if(sp<.12){p.vx+= (Math.random()-.5)*.02;p.vy+=(Math.random()-.5)*.02}
+  bx.beginPath();bx.arc(p.x,p.y,p.r,0,7);bx.fillStyle='rgba('+p.hue+',.5)';bx.fill();
+ });
+ // faint links between near particles, stronger near the pointer
+ for(let i=0;i<bp.length;i++)for(let j=i+1;j<bp.length;j++){
+  const a=bp[i],b=bp[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+  if(d<95){let alpha=.10*(1-d/95);if(mouse&&Math.hypot(mouse.x-(a.x+b.x)/2,mouse.y-(a.y+b.y)/2)<170)alpha+=.13;
+   bx.beginPath();bx.moveTo(a.x,a.y);bx.lineTo(b.x,b.y);bx.strokeStyle='rgba(21,96,130,'+alpha+')';bx.stroke()}
+ }
+ if(mouse&&!reduced){const g=bx.createRadialGradient(mouse.x,mouse.y,0,mouse.x,mouse.y,150);g.addColorStop(0,'rgba(242,165,65,.10)');g.addColorStop(1,'rgba(242,165,65,0)');bx.fillStyle=g;bx.fillRect(mouse.x-150,mouse.y-150,300,300)}
+ requestAnimationFrame(bloop);
+}
+bloop();
+})();
 </script>
 </body>
 </html>
