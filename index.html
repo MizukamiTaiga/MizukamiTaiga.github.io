@@ -29,11 +29,35 @@ section{padding:52px 0 8px}h2{font-size:1.65rem;color:var(--dark);border-left:6p
 table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px 10px;border-bottom:1px solid #e7edef;vertical-align:top}th{width:32%;color:var(--dark)}
 footer{margin-top:60px;background:var(--dark);color:#dce8ec;padding:30px 20px}footer a{color:#fff}
 .note{background:#fff8e8;border:1px solid #f0d48a;border-radius:12px;padding:16px 18px}
+/* --- animations --- */
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0;z-index:50}
+header{position:relative;overflow:hidden;background:linear-gradient(120deg,var(--dark),var(--main),#1d7ea3,var(--main));background-size:220% 220%;animation:heroShift 14s ease infinite}
+@keyframes heroShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+#particles{position:absolute;inset:0;width:100%;height:100%;opacity:.55;pointer-events:none}
+header .wrap{position:relative;z-index:1}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+.card{transition:transform .25s ease,box-shadow .25s ease}
+.card:hover{transform:translateY(-5px);box-shadow:0 12px 26px rgba(11,47,63,.13)}
+.badge{animation:pop .6s ease both}.badge:nth-child(2){animation-delay:.08s}.badge:nth-child(3){animation-delay:.16s}.badge:nth-child(4){animation-delay:.24s}.badge:nth-child(5){animation-delay:.32s}
+@keyframes pop{from{opacity:0;transform:scale(.8) translateY(8px)}to{opacity:1;transform:none}}
+.dogwrap{position:relative;display:inline-block;cursor:pointer}
+.dogwrap img{animation:breathe 3.6s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
+.dogwrap.wiggle img{animation:wiggle .6s ease}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-3deg) scale(1.04)}75%{transform:rotate(3deg) scale(1.04)}}
+.bubble{position:absolute;top:-14px;right:-10px;background:#fff;color:var(--dark);border:2px solid var(--accent);border-radius:999px;padding:4px 12px;font-weight:800;font-size:.9rem;opacity:0;transform:translateY(6px);transition:.25s;pointer-events:none}
+.bubble.show{opacity:1;transform:none}
+figure.card img{transition:transform 6s ease}figure.card:hover img{transform:scale(1.04)}
+figure.card{overflow:hidden}
+#rotator{color:var(--accent);font-weight:800}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
 </style>
 </head>
 <body>
-<header><div class="wrap">
-<div class="kicker">Portfolio / Research &amp; Creative Technology</div>
+<div id="progress"></div>
+<header><canvas id="particles" aria-hidden="true"></canvas><div class="wrap">
+<div class="kicker">Portfolio / <span id="rotator">Computer Vision</span></div>
 <h1>Taiga Mizukami<small>水上 大河</small></h1>
 <p class="lead">山梨大学大学院で、視覚障害者の移動を支えるウェアラブル自己位置推定を研究しています。カメラによる視覚ランドマーク、歩行者デッドレコニング（PDR）、そしてマイクアレイによる音響情報を組み合わせ、屋外でも使えるナビゲーションの実現を目指しています。</p>
 <div class="badges"><span class="badge">University of Yamanashi — M1</span><span class="badge">Computer Vision</span><span class="badge">Acoustic Sensing</span><span class="badge">Assistive Technology</span><span class="badge">Blender / VFX</span></div>
@@ -45,7 +69,7 @@ footer{margin-top:60px;background:var(--dark);color:#dce8ec;padding:30px 20px}fo
 
 <section id="about"><h2>About</h2>
 <div class="card profile">
-<div><img src="assets/github-avatar.jpg" alt="GitHubアバター（眠っている犬の写真）" style="width:180px;height:180px;object-fit:cover;border-radius:14px;display:block"><p class="muted" style="font-size:.85rem;margin-top:8px">GitHubでも使っているアバター</p></div>
+<div><span class="dogwrap" id="dog" title="クリックしてみて"><img src="assets/github-avatar.jpg" alt="GitHubアバター（眠っている犬の写真）" style="width:180px;height:180px;object-fit:cover;border-radius:14px;display:block"><span class="bubble" id="bubble">……むにゃ</span></span><p class="muted" style="font-size:.85rem;margin-top:8px">GitHubでも使っているアバター（クリックしてみて）</p></div>
 <div><table>
 <tr><th>名前</th><td>水上 大河（Taiga Mizukami）</td></tr>
 <tr><th>所属</th><td>山梨大学大学院 医工農学総合教育部 工学専攻 メカトロニクス工学コース<br>小谷・渡辺研究室</td></tr>
@@ -115,5 +139,28 @@ footer{margin-top:60px;background:var(--dark);color:#dce8ec;padding:30px 20px}fo
 
 </main>
 <footer><div class="wrap">© 2026 Taiga Mizukami.</div></footer>
+<script>
+// scroll progress + reveal
+addEventListener('scroll',()=>{const h=document.documentElement;document.getElementById('progress').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%'},{passive:true});
+document.querySelectorAll('section,.card,figure').forEach(e=>e.classList.add('reveal'));
+new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');}}),{threshold:.08}).observe(document.body);
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.08});
+document.querySelectorAll('.reveal').forEach(e=>io.observe(e));
+// rotating keywords
+const words=['Computer Vision','Acoustic Sensing','Assistive Technology','Particle Filter','Virtual Tourism VFX'];let wi=0;
+const rot=document.getElementById('rotator');
+setInterval(()=>{rot.style.opacity=0;setTimeout(()=>{wi=(wi+1)%words.length;rot.textContent=words[wi];rot.style.opacity=1},250)},2600);
+rot.style.transition='opacity .25s';
+// dog interaction
+const dog=document.getElementById('dog'),bubble=document.getElementById('bubble');const lines=['……むにゃ','ワン！','ねむい……','なでた？'];
+let li=0;dog.addEventListener('click',()=>{dog.classList.remove('wiggle');void dog.offsetWidth;dog.classList.add('wiggle');bubble.textContent=lines[li++%lines.length];bubble.classList.add('show');setTimeout(()=>bubble.classList.remove('show'),1400)});
+// particle-filter inspired canvas in hero
+const cv=document.getElementById('particles'),ctx=cv.getContext('2d');let W,H,ps=[];
+function size(){W=cv.width=cv.offsetWidth;H=cv.height=cv.offsetHeight}size();addEventListener('resize',size);
+for(let i=0;i<55;i++)ps.push({x:Math.random(),y:Math.random(),vx:(Math.random()-.5)*.0006,vy:(Math.random()-.5)*.0006,r:Math.random()*2+1});
+(function loop(){ctx.clearRect(0,0,W,H);ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>1)p.vx*=-1;if(p.y<0||p.y>1)p.vy*=-1;ctx.beginPath();ctx.arc(p.x*W,p.y*H,p.r,0,7);ctx.fillStyle='rgba(255,255,255,.75)';ctx.fill()});
+for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++){const a=ps[i],b=ps[j],d=Math.hypot((a.x-b.x)*W,(a.y-b.y)*H);if(d<110){ctx.beginPath();ctx.moveTo(a.x*W,a.y*H);ctx.lineTo(b.x*W,b.y*H);ctx.strokeStyle='rgba(255,255,255,'+(0.16*(1-d/110))+')';ctx.stroke()}}
+requestAnimationFrame(loop)})();
+</script>
 </body>
 </html>
