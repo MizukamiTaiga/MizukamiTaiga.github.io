@@ -211,8 +211,8 @@ function bloop(now){
   if(p.x<0||p.x>BW)p.vx*=-1;if(p.y<0||p.y>BH)p.vy*=-1;
   if(mouse&&!reduced){
    const dx=mouse.x-p.x,dy=mouse.y-p.y,d=Math.hypot(dx,dy);
-   if(d<230&&d>26){const f=(1-d/230)*.055;p.vx+=dx/d*f;p.vy+=dy/d*f}
-   else if(d<=26){p.vx-=dx/(d||1)*.02;p.vy-=dy/(d||1)*.02}
+   if(d<130&&d>20){const f=(1-d/130)*.022;p.vx+=dx/d*f;p.vy+=dy/d*f}
+   else if(d<=20){p.vx-=dx/(d||1)*.015;p.vy-=dy/(d||1)*.015}
   }
   // keep speeds calm
   p.vx*=.985;p.vy*=.985;
@@ -222,10 +222,10 @@ function bloop(now){
  // faint links between near particles, stronger near the pointer
  for(let i=0;i<bp.length;i++)for(let j=i+1;j<bp.length;j++){
   const a=bp[i],b=bp[j],d=Math.hypot(a.x-b.x,a.y-b.y);
-  if(d<95){let alpha=.10*(1-d/95);if(mouse&&Math.hypot(mouse.x-(a.x+b.x)/2,mouse.y-(a.y+b.y)/2)<170)alpha+=.13;
+  if(d<95){let alpha=.10*(1-d/95);if(mouse&&Math.hypot(mouse.x-(a.x+b.x)/2,mouse.y-(a.y+b.y)/2)<110)alpha+=.13;
    bx.beginPath();bx.moveTo(a.x,a.y);bx.lineTo(b.x,b.y);bx.strokeStyle='rgba(21,96,130,'+alpha+')';bx.stroke()}
  }
- if(mouse&&!reduced){const g=bx.createRadialGradient(mouse.x,mouse.y,0,mouse.x,mouse.y,150);g.addColorStop(0,'rgba(242,165,65,.10)');g.addColorStop(1,'rgba(242,165,65,0)');bx.fillStyle=g;bx.fillRect(mouse.x-150,mouse.y-150,300,300)}
+ if(mouse&&!reduced){const g=bx.createRadialGradient(mouse.x,mouse.y,0,mouse.x,mouse.y,100);g.addColorStop(0,'rgba(242,165,65,.10)');g.addColorStop(1,'rgba(242,165,65,0)');bx.fillStyle=g;bx.fillRect(mouse.x-100,mouse.y-100,200,200)}
  requestAnimationFrame(bloop);
 }
 requestAnimationFrame(bloop);
