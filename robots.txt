@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mizukamitaiga.github.io/sitemap.xml
