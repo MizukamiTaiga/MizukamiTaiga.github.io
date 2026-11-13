@@ -10,11 +10,19 @@
 *{box-sizing:border-box}body{margin:0;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",Meiryo,sans-serif;color:var(--text);background:var(--bg);line-height:1.9}
 a{color:var(--main)}.wrap{max-width:760px;margin:0 auto;padding:0 20px}
 header{padding:36px 20px 8px}header .wrap{padding:0}
-h1{color:var(--dark);font-size:1.9rem;line-height:1.4}.date{font-weight:800;color:var(--main)}
+h1{color:var(--dark);font-size:1.9rem;line-height:1.4}h2{color:var(--dark);font-size:1.25rem;border-left:5px solid var(--main);padding-left:10px;margin:1.6em 0 .6em}.date{font-weight:800;color:var(--main)}
+figure{margin:1.2em 0}figcaption{color:var(--muted);font-size:.85rem;text-align:center;margin-top:6px}
+.related{background:#eef4f6;border-radius:10px;padding:14px 20px;margin:1.6em 0 .4em}.related p{margin:.3em 0;font-weight:800;color:var(--dark)}.related ul{margin:.3em 0 .6em;padding-left:1.2em}
 article{background:#fff;border:1px solid #e3eaec;border-radius:14px;padding:26px;margin:10px 0 30px}
 img{max-width:100%;border-radius:10px}
 footer{background:var(--dark);color:#dce8ec;padding:26px 20px}footer a{color:#fff}
 .card,article{animation:rise .7s ease both}@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}img{transition:transform 5s ease}img:hover{transform:scale(1.03)}
+
+.site{background:linear-gradient(135deg,var(--dark),var(--main));color:#fff;padding:16px 20px}.site .wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding:0}
+.brand a{color:#fff;font-weight:800;text-decoration:none;font-size:1.05rem}.brand span{background:var(--accent);color:#402a04;border-radius:999px;padding:1px 10px;font-size:.78rem;font-weight:800;margin-left:8px}
+.hnav a{color:#dce8ec;text-decoration:none;margin-left:16px;font-size:.92rem}.hnav a:hover{color:#fff;text-decoration:underline}
+.crumb{margin:26px 0 4px}
+.fgrid{display:flex;gap:28px;flex-wrap:wrap;justify-content:space-between}.fname{font-weight:800;color:#fff;margin:.2em 0}.fmut{color:#b9cdd4;font-size:.9rem;margin:.2em 0}.fcopy{border-top:1px solid rgba(255,255,255,.18);margin-top:18px;padding-top:12px;font-size:.85rem;color:#b9cdd4}
 </style>
 <!-- SEO -->
 <link rel="canonical" href="https://mizukamitaiga.github.io/blog/2026-11-12-hello.html">
@@ -23,25 +31,40 @@ footer{background:var(--dark);color:#dce8ec;padding:26px 20px}footer a{color:#ff
 <meta property="og:type" content="article">
 <meta property="og:title" content="ホームページを開設しました — 水上大河 Blog">
 <meta property="og:url" content="https://mizukamitaiga.github.io/blog/2026-11-12-hello.html">
-<meta property="og:image" content="{SITE}/assets/research-field.jpg">
+<meta property="og:image" content="https://mizukamitaiga.github.io/assets/research-field.jpg">
 <meta property="article:published_time" content="2026-11-12T00:00:00+09:00">
 <meta property="article:author" content="Taiga Mizukami">
 <meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","headline":"ホームページを開設しました","datePublished":"2026-11-12","dateModified":"2026-11-12","author":{"@type":"Person","name":"水上大河","alternateName":"Taiga Mizukami","url":"https://mizukamitaiga.github.io/"},"image":"{SITE}/assets/research-field.jpg","mainEntityOfPage":"https://mizukamitaiga.github.io/blog/2026-11-12-hello.html"}
+{"@context":"https://schema.org","@type":"BlogPosting","headline":"ホームページを開設しました","datePublished":"2026-11-12","dateModified":"2026-11-13","author":{"@type":"Person","name":"水上大河","alternateName":"Taiga Mizukami","url":"https://mizukamitaiga.github.io/"},"image":"https://mizukamitaiga.github.io/assets/research-field.jpg","mainEntityOfPage":"https://mizukamitaiga.github.io/blog/2026-11-12-hello.html"}
 </script>
 <!-- /SEO -->
 </head>
 <body>
-<header><div class="wrap"><p><a href="./">← ブログ一覧へ</a>　<a href="../">トップへ</a></p><div class="date">2026-11-12</div><h1>ホームページを開設しました</h1></div></header>
+<header class="site" id="top"><div class="wrap"><div class="brand"><a href="../">Taiga Mizukami</a><span>Blog</span></div><nav class="hnav"><a href="../">トップ</a><a href="./">ブログ一覧</a><a href="../#research">Research</a><a href="../#projects">Projects</a></nav></div></header>
+<div class="wrap"><p class="crumb"><a href="./">← ブログ一覧へ</a></p><div class="date">2026-11-12</div><h1>ホームページを開設しました</h1></div>
 <main class="wrap"><article>
-<p>はじめまして、水上大河です。山梨大学大学院の修士1年で、視覚障害者向けのウェアラブル自己位置推定を研究しています。</p>
+<h2>自己紹介</h2>
+<p>はじめまして、水上大河です。山梨大学大学院の修士1年で、視覚障害者向けのウェアラブル自己位置推定を研究しています。研究の概要は<a href="../#research">トップページの Research</a> にまとめています。</p>
+<h2>ホームページを開設しました</h2>
 <p>このたび GitHub Pages で自分のホームページを開設しました。トップページには所属や研究の概要、取り組んでいるプロジェクト、発表予定などをまとめています。</p>
-<p><img src="../assets/research-field.jpg" alt="道路脇に三脚とマイクアレイ、ノートPCを設置した定点録音の様子"></p>
+<figure>
+<img src="../assets/research-field.jpg" alt="道路脇に三脚とマイクアレイ、ノートPCを設置した定点録音の様子">
+<figcaption>屋外での定点録音の様子（甲府市）。マイクアレイで車両の通過音を多チャンネルで録っています。</figcaption>
+</figure>
 <p>写真は、屋外で定点録音をしたときの様子です。マイクアレイで車両の通過音を多チャンネルで録り、音から周囲の動きを捉える研究につなげています。ちょうど今日も、甲府で録音をしてきたところでした。</p>
+<h2>このブログについて</h2>
 <p>このブログでは、研究やバーチャル観光VFXの制作について、公開できる範囲で近況を書いていく予定です。発表が終わったあとの振り返りや、制作の裏側みたいな話が中心になると思います。</p>
 <p>不定期更新ですが、よろしくお願いします。</p>
+<div class="related">
+<p>関連リンク</p>
+<ul>
+<li><a href="../">トップページ</a></li>
+<li><a href="2026-11-12-vfx-first-image.html">次の記事：バーチャル観光VFX、はじめの一枚</a></li>
+<li><a href="./">ブログ一覧へ</a></li>
+</ul>
+</div>
 </article></main>
-<footer><div class="wrap">© 2026 Taiga Mizukami. <a href="./">ブログ一覧へ</a></div></footer>
+<footer><div class="wrap"><div class="fgrid"><div><p class="fname">Taiga Mizukami — Blog</p><p class="fmut">研究と制作の近況を、公開できる範囲で書いています。</p></div><div><p class="fname">Links</p><p><a href="../">トップ</a>　<a href="./">ブログ一覧</a>　<a href="https://github.com/MizukamiTaiga" target="_blank" rel="noopener">GitHub</a></p></div></div><p class="fcopy">© 2026 Taiga Mizukami. Built with GitHub Pages.　<a href="#top">↑ ページ上部へ</a></p></div></footer>
 </body>
 </html>
