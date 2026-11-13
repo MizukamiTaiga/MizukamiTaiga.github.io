@@ -80,7 +80,7 @@ figure.card{overflow:hidden}
 <body>
 <canvas id="bgParticles" aria-hidden="true"></canvas>
 <div id="progress"></div>
-<header><canvas id="particles" aria-hidden="true"></canvas><div class="wrap">
+<header id="top"><canvas id="particles" aria-hidden="true"></canvas><div class="wrap">
 <div class="kicker">Portfolio / <span id="rotator">Computer Vision</span></div>
 <h1>Taiga Mizukami<small>水上 大河</small></h1>
 <p class="lead">山梨大学大学院で、視覚障害者の移動を支えるウェアラブル自己位置推定を研究しています。カメラによる視覚ランドマーク、歩行者デッドレコニング（PDR）、そしてマイクアレイによる音響情報を組み合わせ、屋外でも使えるナビゲーションの実現を目指しています。</p>
@@ -163,7 +163,7 @@ figure.card{overflow:hidden}
 </section>
 
 </main>
-<footer><div class="wrap">© 2026 Taiga Mizukami.</div></footer>
+<footer><div class="wrap"><div style="display:flex;gap:28px;flex-wrap:wrap;justify-content:space-between"><div><p style="font-weight:800;color:#fff;margin:.2em 0">Taiga Mizukami</p><p style="color:#b9cdd4;font-size:.9rem;margin:.2em 0">山梨大学大学院 修士1年。視覚障害者向けウェアラブル自己位置推定と、バーチャル観光VFXに取り組んでいます。</p></div><div><p style="font-weight:800;color:#fff;margin:.2em 0">Links</p><p><a href="blog/">Blog</a>　<a href="https://github.com/MizukamiTaiga" target="_blank" rel="noopener">GitHub</a>　<a href="#presentations">Presentations</a></p></div></div><p style="border-top:1px solid rgba(255,255,255,.18);margin-top:18px;padding-top:12px;font-size:.85rem;color:#b9cdd4">© 2026 Taiga Mizukami. Built with GitHub Pages.　<a href="#top">↑ ページ上部へ</a></p></div></footer>
 <script>
 // scroll progress + reveal
 addEventListener('scroll',()=>{const h=document.documentElement;document.getElementById('progress').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%'},{passive:true});
