@@ -163,7 +163,7 @@ figure.card{overflow:hidden}
 </section>
 
 </main>
-<footer><div class="wrap"><div style="display:flex;gap:28px;flex-wrap:wrap;justify-content:space-between"><div><p style="font-weight:800;color:#fff;margin:.2em 0">Taiga Mizukami</p><p style="color:#b9cdd4;font-size:.9rem;margin:.2em 0">山梨大学大学院 修士1年。視覚障害者向けウェアラブル自己位置推定と、バーチャル観光VFXに取り組んでいます。</p></div><div><p style="font-weight:800;color:#fff;margin:.2em 0">Links</p><p><a href="blog/">Blog</a>　<a href="https://github.com/MizukamiTaiga" target="_blank" rel="noopener">GitHub</a>　<a href="#presentations">Presentations</a></p></div></div><p style="border-top:1px solid rgba(255,255,255,.18);margin-top:18px;padding-top:12px;font-size:.85rem;color:#b9cdd4">© 2026 Taiga Mizukami. Built with GitHub Pages.　<a href="#top">↑ ページ上部へ</a></p></div></footer>
+<footer><div class="wrap"><div style="display:flex;gap:28px;flex-wrap:wrap;justify-content:space-between"><div><p style="font-weight:800;color:#fff;margin:.2em 0">Taiga Mizukami</p><p style="color:#b9cdd4;font-size:.9rem;margin:.2em 0">山梨大学大学院 修士1年。視覚障害者向けウェアラブル自己位置推定と、バーチャル観光VFXに取り組んでいます。</p></div><div><p style="font-weight:800;color:#fff;margin:.2em 0">Links</p><p><a href="blog/">Blog</a>　<a href="https://github.com/MizukamiTaiga" target="_blank" rel="noopener">GitHub</a>　<a href="#presentations">Presentations</a></p></div></div><p style="border-top:1px solid rgba(255,255,255,.18);margin-top:18px;padding-top:12px;font-size:.85rem;color:#b9cdd4">訪問回数 <img src="https://hits.sh/mizukamitaiga.github.io.svg?style=flat-square&label=Visitors&color=156082" alt="訪問回数カウンター" style="vertical-align:middle;border-radius:4px"></p><p style="font-size:.85rem;color:#b9cdd4">© 2026 Taiga Mizukami. Built with GitHub Pages.　<a href="#top">↑ ページ上部へ</a></p></div></footer>
 <script>
 // scroll progress + reveal
 addEventListener('scroll',()=>{const h=document.documentElement;document.getElementById('progress').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%'},{passive:true});
@@ -191,7 +191,7 @@ requestAnimationFrame(loop)})();
 const bg=document.getElementById('bgParticles');if(!bg)return;
 const bx=bg.getContext('2d');let BW,BH;const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 function bsize(){BW=bg.width=innerWidth;BH=bg.height=innerHeight}bsize();addEventListener('resize',bsize);
-const N=innerWidth<640?55:95;const bp=[];const LIFE=15;
+const N=innerWidth<640?28:48;const bp=[];const LIFE=15;
 function spawn(p){p.x=Math.random()*BW;p.y=Math.random()*BH;p.vx=(Math.random()-.5)*.35;p.vy=(Math.random()-.5)*.35;p.age=0;return p}
 for(let i=0;i<N;i++){const p=spawn({r:Math.random()*2.2+1.2,hue:Math.random()<.22?'242,165,65':'21,96,130'});p.age=Math.random()*LIFE;bp.push(p)}
 let mouse=null;
