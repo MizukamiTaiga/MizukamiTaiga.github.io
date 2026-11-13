@@ -84,7 +84,7 @@ a.cardlink{display:block;text-decoration:none;color:inherit;cursor:pointer}a.car
 <header id="top"><canvas id="particles" aria-hidden="true"></canvas><div class="wrap">
 <div class="kicker">Portfolio / <span id="rotator">Computer Vision</span></div>
 <h1>Taiga Mizukami<small>水上 大河</small></h1>
-<p class="lead">山梨大学大学院で、視覚障害者の移動を支えるウェアラブル自己位置推定を研究しています。カメラによる視覚ランドマーク、歩行者デッドレコニング（PDR）、そしてマイクアレイによる音響情報を組み合わせ、屋外でも使えるナビゲーションの実現を目指しています。</p>
+<p class="lead">山梨大学大学院で、視覚障害者の移動を支えるウェアラブル自己位置推定を研究しています。カメラによる視覚ランドマーク、歩行者自律航法（PDR）、そしてマイクアレイによる音響情報を組み合わせ、屋外でも使えるナビゲーションの実現を目指しています。</p>
 <div class="badges"><span class="badge">University of Yamanashi — M1</span><span class="badge">Computer Vision</span><span class="badge">Acoustic Sensing</span><span class="badge">Assistive Technology</span><span class="badge">Blender / VFX</span></div>
 </div></header>
 
@@ -110,7 +110,7 @@ a.cardlink{display:block;text-decoration:none;color:inherit;cursor:pointer}a.car
 <section id="research"><h2>Research</h2>
 <div class="grid">
 <article class="card"><h3>ウェアラブル自己位置推定</h3><p>視覚障害者向けナビゲーションを想定し、装着型デバイスで歩行者の位置と向きを推定する研究です。GPSだけでは不安定になる市街地でも、周囲の情報から自分の位置を捉え続けることを目指します。</p></article>
-<article class="card"><h3>Visual Landmarks + PDR</h3><p>カメラ画像から周囲のランドマークを捉える視覚情報と、IMU等による歩行者デッドレコニングを組み合わせ、移動中も途切れにくい自己位置推定を行います。物体検出には YOLO 系モデル、状態推定には粒子フィルタなどを活用しています。</p></article>
+<article class="card"><h3>Visual Landmarks + PDR</h3><p>カメラ画像から周囲のランドマークを捉える視覚情報と、IMU等による歩行者自律航法を組み合わせ、移動中も途切れにくい自己位置推定を行います。物体検出には YOLO 系モデル、状態推定には粒子フィルタなどを活用しています。</p></article>
 <article class="card"><h3>マイクアレイによる音響活用</h3><p>ReSpeaker マイクアレイによる多チャンネル録音を用い、車両の通過方向など周囲の音響情報を安全支援に活かす方法を検討しています。視覚情報だけでは得られない「音から分かる周囲の動き」を取り入れるのが狙いです。</p></article>
 </div>
 <figure class="card" style="margin:16px 0 0;padding:14px"><img src="assets/research-setup-wide.jpg" alt="道路脇に三脚とマイクアレイ、ノートPCを設置した定点録音の様子" style="width:100%;height:auto;border-radius:10px;display:block"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px"><img src="assets/research-array-top.jpg" alt="マイクアレイ（ReSpeaker）を真上から見た様子" style="width:100%;height:auto;border-radius:10px;display:block"><img src="assets/research-fieldwork.jpg" alt="定点録音の現場で撮影する様子（後ろ姿）" style="width:100%;height:auto;border-radius:10px;display:block"></div><figcaption class="muted" style="margin-top:8px;font-size:.92rem">屋外での定点録音の様子（2026年11月、甲府市）。三脚上のマイクアレイと録音用PCで、車両の通過音を多チャンネルで記録する。</figcaption></figure>
