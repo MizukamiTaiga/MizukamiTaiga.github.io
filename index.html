@@ -52,7 +52,7 @@ header .wrap{position:relative;z-index:1}
 @keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-3deg) scale(1.04)}75%{transform:rotate(3deg) scale(1.04)}}
 .bubble{position:absolute;top:-14px;right:-10px;background:#fff;color:var(--dark);border:2px solid var(--accent);border-radius:999px;padding:4px 12px;font-weight:800;font-size:.9rem;opacity:0;transform:translateY(6px);transition:.25s;pointer-events:none}
 .bubble.show{opacity:1;transform:none}
-figure.card img{transition:transform 6s ease}figure.card:hover img{transform:scale(1.04)}
+
 figure.card{overflow:hidden}
 #rotator{color:var(--accent);font-weight:800}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
@@ -67,12 +67,12 @@ a.cardlink{display:block;text-decoration:none;color:inherit;cursor:pointer}a.car
 <meta property="og:title" content="水上大河（Taiga Mizukami）| 山梨大学大学院 ポートフォリオ">
 <meta property="og:description" content="山梨大学大学院で視覚障害者向けウェアラブル自己位置推定を研究する水上大河の公式ポートフォリオ。コンピュータビジョン、音響、バーチャル観光VFX。">
 <meta property="og:url" content="https://mizukamitaiga.github.io/">
-<meta property="og:image" content="https://mizukamitaiga.github.io/assets/research-field.jpg">
+<meta property="og:image" content="https://mizukamitaiga.github.io/assets/research-setup-wide.jpg">
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="水上大河（Taiga Mizukami）| 山梨大学大学院 ポートフォリオ">
 <meta name="twitter:description" content="視覚障害者向けウェアラブル自己位置推定の研究、コンピュータビジョンと音響、バーチャル観光VFX。">
-<meta name="twitter:image" content="https://mizukamitaiga.github.io/assets/research-field.jpg">
+<meta name="twitter:image" content="https://mizukamitaiga.github.io/assets/research-setup-wide.jpg">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Person","name":"水上大河","alternateName":"Taiga Mizukami","url":"https://mizukamitaiga.github.io/","image":"https://mizukamitaiga.github.io/assets/github-avatar.jpg","jobTitle":"Graduate Student Researcher","affiliation":{"@type":"CollegeOrUniversity","name":"山梨大学大学院","alternateName":"University of Yamanashi"},"alumniOf":{"@type":"CollegeOrUniversity","name":"University of Yamanashi"},"address":{"@type":"PostalAddress","addressLocality":"甲府市","addressRegion":"山梨県","addressCountry":"JP"},"knowsAbout":["Wearable Self-Localization","Visual Landmarks","Pedestrian Dead Reckoning","Computer Vision","Microphone Array","Acoustic Sensing","Assistive Technology","Blender","Virtual Tourism VFX"],"sameAs":["https://github.com/MizukamiTaiga"]}
 </script>
@@ -113,7 +113,7 @@ a.cardlink{display:block;text-decoration:none;color:inherit;cursor:pointer}a.car
 <article class="card"><h3>Visual Landmarks + PDR</h3><p>カメラ画像から周囲のランドマークを捉える視覚情報と、IMU等による歩行者デッドレコニングを組み合わせ、移動中も途切れにくい自己位置推定を行います。物体検出には YOLO 系モデル、状態推定には粒子フィルタなどを活用しています。</p></article>
 <article class="card"><h3>マイクアレイによる音響活用</h3><p>ReSpeaker マイクアレイによる多チャンネル録音を用い、車両の通過方向など周囲の音響情報を安全支援に活かす方法を検討しています。視覚情報だけでは得られない「音から分かる周囲の動き」を取り入れるのが狙いです。</p></article>
 </div>
-<figure class="card" style="margin:16px 0 0;padding:14px"><img src="assets/research-field.jpg" alt="道路脇に三脚とマイクアレイ、ノートPCを設置した定点録音の様子" style="width:100%;height:auto;border-radius:10px;display:block"><figcaption class="muted" style="margin-top:8px;font-size:.92rem">屋外での定点録音の様子（2026年11月、甲府市）。三脚上のマイクアレイと録音用PCで、車両の通過音を多チャンネルで記録する。</figcaption></figure>
+<figure class="card" style="margin:16px 0 0;padding:14px"><img src="assets/research-setup-wide.jpg" alt="道路脇に三脚とマイクアレイ、ノートPCを設置した定点録音の様子" style="width:100%;height:auto;border-radius:10px;display:block"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px"><img src="assets/research-array-top.jpg" alt="マイクアレイ（ReSpeaker）を真上から見た様子" style="width:100%;height:auto;border-radius:10px;display:block"><img src="assets/research-fieldwork.jpg" alt="定点録音の現場で撮影する様子（後ろ姿）" style="width:100%;height:auto;border-radius:10px;display:block"></div><figcaption class="muted" style="margin-top:8px;font-size:.92rem">屋外での定点録音の様子（2026年11月、甲府市）。三脚上のマイクアレイと録音用PCで、車両の通過音を多チャンネルで記録する。</figcaption></figure>
 <div class="card" style="margin-top:16px"><h3>キーワード</h3><div class="tags"><span class="tag">Self-Localization</span><span class="tag">Visual Landmarks</span><span class="tag">Pedestrian Dead Reckoning</span><span class="tag">Microphone Array</span><span class="tag">DOA Estimation</span><span class="tag">Object Detection</span><span class="tag">Particle Filter</span><span class="tag">Assistive Technology</span></div>
 <p class="muted">※ このページでは研究の概要のみを紹介しています。未発表データや原稿の詳細は掲載していません。</p></div>
 </section>
