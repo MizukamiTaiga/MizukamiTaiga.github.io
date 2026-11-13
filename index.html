@@ -58,6 +58,7 @@ figure.card{overflow:hidden}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
 a.cardlink{display:block;text-decoration:none;color:inherit;cursor:pointer}a.cardlink:hover{border-color:#156082}
 nav a i{font-style:normal;color:var(--accent);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.78rem;margin-right:5px}
+nav a{border-bottom:3px solid transparent;padding-bottom:2px}nav a.cur{border-color:var(--accent)}
 </style>
 <!-- SEO -->
 <link rel="canonical" href="https://mizukamitaiga.github.io/">
@@ -234,6 +235,12 @@ function bloop(now){
 }
 requestAnimationFrame(bloop);
 })();
+</script>
+<script>
+// scrollspy: underline the nav item of the section in view
+(()=>{const links=[...document.querySelectorAll('nav a[href^="#"]')];const secs=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
+const spy=()=>{const y=scrollY+140;let cur=null;secs.forEach(s=>{if(s.offsetTop<=y)cur=s.id});links.forEach(a=>a.classList.toggle('cur',a.getAttribute('href')==='#'+cur))};
+addEventListener('scroll',spy,{passive:true});spy()})();
 </script>
 </body>
 </html>
