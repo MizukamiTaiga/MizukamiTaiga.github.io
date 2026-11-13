@@ -179,7 +179,7 @@ const rot=document.getElementById('rotator');
 setInterval(()=>{rot.style.opacity=0;setTimeout(()=>{wi=(wi+1)%words.length;rot.textContent=words[wi];rot.style.opacity=1},250)},2600);
 rot.style.transition='opacity .25s';
 // dog interaction
-const dog=document.getElementById('dog'),bubble=document.getElementById('bubble');const lines=['……むにゃ','ワン！','ねむい……','なでた？'];
+const dog=document.getElementById('dog'),bubble=document.getElementById('bubble');const lines=['……むにゃ','ワン！','ねむい……','なでた？','ぼくミシェル！','アメリカンコッカー！','クマじゃないよ！'];
 let li=0;dog.addEventListener('click',()=>{dog.classList.remove('wiggle');void dog.offsetWidth;dog.classList.add('wiggle');bubble.textContent=lines[li++%lines.length];bubble.classList.add('show');setTimeout(()=>bubble.classList.remove('show'),1400)});
 // particle-filter inspired canvas in hero
 const cv=document.getElementById('particles'),ctx=cv.getContext('2d');let W,H,ps=[];
