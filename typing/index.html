@@ -280,7 +280,7 @@
         <div class="rules">
           <h2>ルール</h2>
           <ul>
-            <li>お題の文が表示されたら、<b>ローマ字</b>で入力。表示は漢字（ふりがな付き）、打つのは下に出るローマ字よ。「し＝shi / si」みたいに、よく使う綴りはどれでも通るわよ。IMEを切り替え忘れて<b>全角（ａｂｃ）で打っても大丈夫</b>、半角として判定するわ。</li>
+            <li>お題の文が表示されたら、<b>ローマ字</b>で入力。表示は漢字（ふりがな付き）、打つのは下に出るローマ字よ。「し＝shi / si」みたいに、よく使う綴りはどれでも通るわよ。IMEを切り替え忘れて<b>全角（ａｂｃ）で打っても、かなに変換されても大丈夫</b>、ローマ字として判定するわ（漢字に変換しちゃったらダメよ）。</li>
             <li>かがみんも同じ文を同時に打ち始める。<b>先に打ち切った方が1ポイント</b>。</li>
             <li>かがみんはたまに打ち間違えて止まる。その隙を逃さないこと。</li>
             <li><b>先に目標ポイント</b>を取った方の勝ち。</li>
@@ -344,7 +344,7 @@
           </div>
           <div class="kag-typed mono" id="kagTyped"></div>
           <div class="type-area">
-            <label for="typeInput">ここに入力（ローマ字・半角／全角どちらでもOK）</label>
+            <label for="typeInput">ここに入力（ローマ字・IMEオンでかなに変換されてもOK）</label>
             <input id="typeInput" class="mono" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="カウントダウン後にここへ打って" disabled />
             <div class="type-meta">
               <span id="missInfo">ミス 0</span>
@@ -864,9 +864,9 @@
         { cps: 4.3, fail: 0.35, tierMax: 5, label: "速い", desc: "Lv.5 ― オフィスワーク上位の速さ。油断すると置いていかれるわよ。" },
         { cps: 5.0, fail: 0.30, tierMax: 6, label: "かなり速い", desc: "Lv.6 ― 秒間5打鍵。ミスしたら負けると思って。" },
         { cps: 5.7, fail: 0.26, tierMax: 7, label: "エンジニア級", desc: "Lv.7 ― 打ち慣れたエンジニア並み。かがみん、本気出してきたわよ。" },
-        { cps: 6.4, fail: 0.22, tierMax: 8, label: "達人手前", desc: "Lv.8 ― 秒間6.4打鍵。あんたの実測とほぼ互角の領域よ。" },
+        { cps: 6.4, fail: 0.22, tierMax: 8, label: "達人手前", desc: "Lv.8 ― 秒間6.4打鍵。達人クラスとほぼ互角の領域よ。" },
         { cps: 7.1, fail: 0.18, tierMax: 9, label: "達人", desc: "Lv.9 ― 秒間7打鍵超え。寿司打で大台に乗せる人の速さよ。" },
-        { cps: 7.8, fail: 0.14, tierMax: 10, label: "検定1級キラー", desc: "Lv.10 ― 秒間7.8打鍵、つまずきも激減。……勝てたら本物よ、たいがくん。" }
+        { cps: 7.8, fail: 0.14, tierMax: 10, label: "神速", desc: "Lv.10 ― 秒間7.8打鍵、つまずきも激減。……勝てたら本物よ。" }
       ];
 
       /* ================= 状態 ================= */
@@ -1334,6 +1334,7 @@
         var input = $("typeInput");
         input.value = "";
         input.disabled = true;
+        composing = false; compBaseSet = false; /* 前ラウンドのIME変換状態を引き継がない */
         input.placeholder = "よーい…";
         function beginRace() {
           state.racing = true;
@@ -1504,6 +1505,34 @@
           return String.fromCharCode(ch.charCodeAt(0) - 0xFEE0);
         });
       }
+      /* かな→ローマ字変換：IMEをオンにしたまま打つと、打鍵はローマ字の
+         まま届かず「にく」のようなかな文字列に変換されて入力欄へ届く
+         （母音がかなに吸収される）。そこで、届いたかなをお題生成と
+         まったく同じ規則（parseKana＋canonicalRomaji）で標準ローマ字に
+         戻してから照合する。変換中の未確定分は末尾にローマ字のまま
+         残ることがあるので、かなの連続部分だけを変換し、ローマ字部分は
+         そのまま通す。末尾の「っ」は次の字が来るまで綴りが決まらない
+         ため、確定を次の入力に譲る（保留にする） */
+      function kanaToRomaji(str) {
+        if (!/[ぁ-ゖァ-ヶー]/.test(str)) return str;
+        var out = "", run = "";
+        function flush() {
+          if (!run) return;
+          var us = parseKana(run);
+          for (var i = 0; i < us.length; i++) {
+            if (us[i].sokuon && i === us.length - 1) continue; /* 末尾のっは保留 */
+            out += canonicalRomaji(us, i);
+          }
+          run = "";
+        }
+        for (var i = 0; i < str.length; i++) {
+          var ch = str[i];
+          if (/[ぁ-ゖァ-ヶー]/.test(ch)) run += ch;
+          else { flush(); out += ch; }
+        }
+        flush();
+        return out;
+      }
       var input = $("typeInput");
       function registerMiss(m) {
         state.totalMiss += m;
@@ -1512,30 +1541,85 @@
         beep(160, 0.07, "square", 0.04);
         $("missInfo").textContent = "ミス " + (state.roundMiss || 0) + "（累計 " + state.totalMiss + "）";
       }
-      input.addEventListener("input", function () {
-        if (!state.racing || state.roundOver) return;
-        var val = normalizeFullWidth(input.value).toLowerCase();
-        var prevTyped = matcherTyped();
-        var accepted = 0, misses = 0, i;
-        if (val.indexOf(prevTyped) === 0) {
-          /* 追加された打鍵を1文字ずつマッチャに食わせる */
-          var news = val.slice(prevTyped.length);
-          for (i = 0; i < news.length; i++) { if (feedChar(news[i])) accepted++; else misses++; }
-        } else {
-          /* 削除や途中編集があったら、最初から組み直して整合させる */
-          resetMatcher();
-          for (i = 0; i < val.length; i++) { if (feedChar(val[i])) accepted++; else misses++; }
-        }
-        if (misses > 0) registerMiss(misses);
-        if (accepted > 0) { state.totalKeys += accepted; beep(980, 0.02, "sine", 0.012); }
-        input.value = matcherTyped();
+      /* 照合後の共通処理：ミス・打鍵数の集計、表示更新、打ち切り判定。
+         accDelta は「今回新たに正解した打鍵数」、mis は「今回のミス数」 */
+      function afterFeed(accDelta, mis) {
+        if (mis > 0) registerMiss(mis);
+        if (accDelta > 0) { state.totalKeys += accDelta; beep(980, 0.02, "sine", 0.012); }
         state.roundKeys = matcherTyped().length;
         renderRomajiDisplay();
         var elapsed = (Date.now() - state.roundStartAt) / 1000;
         if (elapsed > 0.5 && matcherTyped().length) $("speedInfo").textContent = "現在 " + (matcherTyped().length / elapsed).toFixed(1) + " 打鍵/秒";
         if (matcherDone()) finishRound("you");
+      }
+      /* 通常の入力（IMEオフ／確定済みテキスト）の照合：
+         前回確定分との差分だけをマッチャに食わせる */
+      function processInput() {
+        if (!state.racing || state.roundOver) return;
+        var val = kanaToRomaji(normalizeFullWidth(input.value).toLowerCase());
+        var prevTyped = matcherTyped();
+        var accepted = 0, misses = 0, lastMissAt = -1, i;
+        if (val.indexOf(prevTyped) === 0) {
+          /* 追加された打鍵を1文字ずつマッチャに食わせる */
+          var news = val.slice(prevTyped.length);
+          for (i = 0; i < news.length; i++) { if (feedChar(news[i])) accepted++; else { misses++; lastMissAt = prevTyped.length + i; } }
+        } else {
+          /* 削除や途中編集があったら、最初から組み直して整合させる */
+          resetMatcher();
+          for (i = 0; i < val.length; i++) { if (feedChar(val[i])) accepted++; else { misses++; lastMissAt = i; } }
+        }
+        /* かな入力の途中（拗音の小さい字がまだ届いていない等）で、末尾の
+           1文字だけが合わないのは確定前の揺れなのでミスに数えない。
+           次の字が届けば正しく判定し直される */
+        if (misses === 1 && lastMissAt === val.length - 1 && /[ぁ-ゖァ-ヶー]$/.test(input.value)) misses = 0;
+        input.value = matcherTyped();
+        afterFeed(accepted, misses);
+      }
+      /* ===== IME変換中（composition）の扱い =====
+         変換中は入力欄の文字列をIMEが握っているため、こちらから
+         input.value を書き換えると変換セッションが壊れてしまう。
+         変換中は書き戻しをせず、届いたかな文字列をローマ字に読み替えて
+         組み直し照合だけ行う（集計はしない。打ち間違いは変換中に
+         直せるため）。確定した時点で、変換開始時点から増えた分だけを
+         打鍵数・ミスとしてまとめて集計する */
+      var composing = false, compBaseSet = false, compBaseTyped = 0;
+      function beginComposition() {
+        if (!compBaseSet) { compBaseSet = true; compBaseTyped = matcherTyped().length; }
+        composing = true;
+      }
+      function processComposition() {
+        var val = kanaToRomaji(normalizeFullWidth(input.value).toLowerCase());
+        resetMatcher();
+        for (var i = 0; i < val.length; i++) feedChar(val[i]);
+        state.roundKeys = matcherTyped().length;
+        renderRomajiDisplay();
+        var elapsed = (Date.now() - state.roundStartAt) / 1000;
+        if (elapsed > 0.5 && matcherTyped().length) $("speedInfo").textContent = "現在 " + (matcherTyped().length / elapsed).toFixed(1) + " 打鍵/秒";
+        if (matcherDone()) finishRound("you");
+      }
+      function finalizeComposition() {
+        if (!state.racing || state.roundOver) return;
+        var val = kanaToRomaji(normalizeFullWidth(input.value).toLowerCase());
+        resetMatcher();
+        var accepted = 0, misses = 0;
+        for (var i = 0; i < val.length; i++) { if (feedChar(val[i])) accepted++; else misses++; }
+        input.value = matcherTyped();
+        afterFeed(Math.max(0, accepted - compBaseTyped), misses);
+      }
+      input.addEventListener("compositionstart", function () { beginComposition(); });
+      input.addEventListener("compositionend", function () {
+        composing = false;
+        if (compBaseSet) { compBaseSet = false; finalizeComposition(); }
+      });
+      input.addEventListener("input", function (e) {
+        if (!state.racing || state.roundOver) return;
+        if (composing || e.isComposing) { beginComposition(); processComposition(); return; }
+        /* compositionend が来ない環境向け：変換中フラグが残っていたら確定処理を先に済ませる */
+        if (compBaseSet) { compBaseSet = false; finalizeComposition(); return; }
+        processInput();
       });
       input.addEventListener("keydown", function (e) {
+        if (composing || e.isComposing || e.key === "Process" || e.keyCode === 229) return; /* IME変換中のキーは横取りしない */
         if (e.key === " ") e.preventDefault(); /* スペースでスクロールさせない */
       });
 
@@ -1594,7 +1678,7 @@
         /* 吹き出し・「がーん」は画像に描き込み済みなので、ここでは重ねない */
         if (win) {
           $("resultComment").textContent = state.level >= 9
-            ? "Lv." + state.level + "のかがみんに勝つなんて…。検定1級、伊達じゃないのね。参りました。"
+            ? "Lv." + state.level + "のかがみんに勝つなんて…。その指さばき、プロ級じゃないの。参りました。"
             : "やられたわね…。でも次はレベル上げてくるから、覚悟しなさい。";
         } else {
           $("resultComment").textContent = state.level <= 2
