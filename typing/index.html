@@ -1294,6 +1294,62 @@
         clearTimeout(bubbleTimer);
         bubbleTimer = setTimeout(function () { bubble.className = "bubble"; }, ms || 1000);
       }
+      /* ================= 勝ち・負けの文（各10種類） =================
+         ラウンドごとの吹き出しと、結果画面のかがみんのコメント。
+         どちらも表示のたびにランダムで1つ選ぶ */
+      function pickLine(lines) { return lines[Math.floor(Math.random() * lines.length)]; }
+      /* ラウンド：あなたがポイントを取った時（かがみんの悔しがり） */
+      var ROUND_WIN_BUBBLES = [
+        "うわあ…！",
+        "ま、まさか…！",
+        "はやっ…！",
+        "うそ、もう打ち終わったの…？",
+        "ぐぬぬ…！",
+        "ちょっと待ってよ…！",
+        "目が追いつかない…！",
+        "や、やるじゃない…",
+        "次は負けないんだから…！",
+        "ミスったのが痛かった…"
+      ];
+      /* ラウンド：かがみんがポイントを取った時（かがみんのどや） */
+      var ROUND_LOSE_BUBBLES = [
+        "どやっ",
+        "ふふん♪",
+        "まだまだね",
+        "私の勝ち♪",
+        "見えた？ 今の速さ",
+        "ついて来れてる？",
+        "ほら、置いてくわよ",
+        "余裕♪ 余裕♪",
+        "この調子！",
+        "あんたもやるけど、私が上♪"
+      ];
+      /* 結果：あなたの勝ち（かがみんの負け惜しみと本音） */
+      var WIN_COMMENTS = [
+        "やられたわね…。でも次はレベル上げてくるから、覚悟しなさい。",
+        "完敗…。その指、どうなってるのよ。ちょっとだけ、ほんとにちょっとだけ尊敬したわ。",
+        "まさか私が負けるなんて…。でも、負けは負け。あんたの勝ちよ、おめでとう。",
+        "ぐっ…！ あと少しだったのに。次は絶対に取り返すんだから！",
+        "その速さ、本物ね。練習の成果が出たってわけ。……私も負けてられないわ。",
+        "はぁ…やられた。でもね、次に会うときはもっと速くなってるから。楽しみにしてなさい。",
+        "ミスしたところで止まってる場合じゃなかったわね。あんた、隙を逃さないのね。",
+        "負けたのは悔しいけど、いい勝負だったわ。……ありがと、楽しかった。",
+        "そんなに速く打てるなら、検定でも受けてみたら？ 冗談じゃなく、通用すると思うわよ。",
+        "今日のところはあんたの勝ち。でも勝負はまだ終わってないわよ。また挑戦してきなさい。"
+      ];
+      /* 結果：かがみんの勝ち（かがみんの勝ち誇りと励まし） */
+      var LOSE_COMMENTS = [
+        "ふふん、このレベルで負けるなんて。……まあ、練習あるのみよ。もう一戦どう？",
+        "いい勝負だったわよ。その速さは本物。でも今日のかがみんは止まらなかったの。",
+        "どう？ 私のタイピング、速かったでしょ。あんたもなかなかだったけどね。",
+        "あと一歩だったわね。その悔しさが次につながるのよ。ほら、もう一戦。",
+        "ふふ、私の勝ち♪ でも油断してたわけじゃないわよ。あんた、けっこう追い上げてきたし。",
+        "まだまだ私には勝てないわよ。……なんて、ちょっとドキドキしたのは内緒ね。",
+        "練習すればもっと速くなるわ。焦らず、正確に。それが結局いちばんの近道よ。",
+        "負けちゃったわね。でもミスが減れば、次はわからないわよ？ リベンジ、待ってる。",
+        "私だって毎日打ってるんだから、このくらいは当然よ。次はレベル下げて出直す？",
+        "いい勝負をありがとう。あんたとなら、また戦いたいって思えるわ。……ほんの少しだけね。"
+      ];
       /* 入力中は typing-a / typing-b を交互表示して指が動いているように見せる */
       var typingTimer = null, typingFlip = false, kagStalledNow = false;
       function startTypingAnim() {
@@ -1638,14 +1694,14 @@
           state.roundTimes.push(elapsed);
           state.winLens.push(matcherTyped().length || state.sentence.ro.length);
           setFace("lose");
-          showBubble("うわあ…！", "lose", 1000);
+          showBubble(pickLine(ROUND_WIN_BUBBLES), "lose", 1000);
           $("roundBanner").textContent = "あなたのポイント！ " + elapsed.toFixed(1) + "秒で打ち切った";
           $("roundBanner").className = "round-banner you";
           beep(784, 0.09, "sine", 0.05); setTimeout(function () { beep(1046, 0.12, "sine", 0.05); }, 90);
         } else {
           state.scoreKag++;
           setFace("win");
-          showBubble("どやっ", "win", 1000);
+          showBubble(pickLine(ROUND_LOSE_BUBBLES), "win", 1000);
           $("roundBanner").textContent = "かがみんのポイント… 先に打ち切られた";
           $("roundBanner").className = "round-banner kag";
           beep(523, 0.09, "sine", 0.05); setTimeout(function () { beep(392, 0.14, "sine", 0.05); }, 90);
@@ -1675,17 +1731,7 @@
         var resultStageInner = $("resultStageInner");
         showPose(resultStageInner, win ? "lose" : "victory");
         /* 吹き出し・「がーん」は画像に描き込み済みなので、ここでは重ねない */
-        if (win) {
-          $("resultComment").textContent = state.level >= 13
-            ? "Lv." + state.level + "のかがみんに勝つなんて…。もう人間離れしてるじゃない。その速さ、文句なしの最速よ。"
-            : state.level >= 9
-            ? "Lv." + state.level + "のかがみんに勝つなんて…。その指さばき、プロ級じゃないの。参りました。"
-            : "やられたわね…。でも次はレベル上げてくるから、覚悟しなさい。";
-        } else {
-          $("resultComment").textContent = state.level <= 2
-            ? "ふふん、このレベルで負けるなんて。……まあ、練習あるのみよ。もう一戦どう？"
-            : "いい勝負だったわよ。その速さは本物。でも今日のかがみんは止まらなかったの。";
-        }
+        $("resultComment").textContent = pickLine(win ? WIN_COMMENTS : LOSE_COMMENTS);
         $("statRounds").textContent = state.round;
         var total = state.totalKeys + state.totalMiss;
         $("statAcc").textContent = total ? (state.totalKeys / total * 100).toFixed(1) + "%" : "―";
