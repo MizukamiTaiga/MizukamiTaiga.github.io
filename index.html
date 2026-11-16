@@ -84,15 +84,11 @@ nav a{border-bottom:3px solid transparent;padding-bottom:2px}nav a.cur{border-co
 /* タイピングカードの「のぞき見かがみん」 */
 .card.peek-card{position:relative;overflow:hidden}
 .card.peek-card .peek{position:absolute;right:0;bottom:0;width:118px;max-width:45%;
-  transform:translateX(103%);pointer-events:none;user-select:none;-webkit-user-drag:none}
-.card.peek-card:hover .peek,.card.peek-card:focus-within .peek{animation:peekIn 3.6s forwards}
-@keyframes peekIn{
-  0%{transform:translateX(103%);animation-timing-function:cubic-bezier(.25,.9,.3,1.12)}
-  15%{transform:translateX(7%)}
-  85%{transform:translateX(7%);animation-timing-function:cubic-bezier(.25,.9,.3,1.12)}
-  100%{transform:translateX(103%)}}
+  transform:translateX(103%);transition:transform .54s cubic-bezier(.25,.9,.3,1.12);
+  pointer-events:none;user-select:none;-webkit-user-drag:none}
+.card.peek-card .peek.show{transform:translateX(7%)}
 @media (hover:none){.card.peek-card .peek{transform:translateX(58%)}}
-@media (prefers-reduced-motion:reduce){.card.peek-card:hover .peek,.card.peek-card:focus-within .peek{animation:none;transform:translateX(7%)}}
+@media (prefers-reduced-motion:reduce){.card.peek-card .peek{transition:none}}
 </style>
 </head>
 <body>
@@ -261,6 +257,21 @@ requestAnimationFrame(bloop);
 (()=>{const links=[...document.querySelectorAll('nav a[href^="#"]')];const secs=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
 const spy=()=>{const y=scrollY+140;let cur=null;secs.forEach(s=>{if(s.offsetTop<=y)cur=s.id});links.forEach(a=>a.classList.toggle('cur',a.getAttribute('href')==='#'+cur))};
 addEventListener('scroll',spy,{passive:true});spy()})();
+</script>
+<script>
+// のぞき見かがみん：ホバーで出て、3秒後（またはホバーを外した時）に同じ速さで引っ込む
+(function(){
+  var card=document.querySelector('.card.peek-card');
+  if(!card) return;
+  var pk=card.querySelector('.peek');
+  var t=null;
+  function show(){ pk.classList.add('show'); clearTimeout(t); t=setTimeout(hide,3000); }
+  function hide(){ clearTimeout(t); pk.classList.remove('show'); }
+  card.addEventListener('mouseenter',show);
+  card.addEventListener('mouseleave',hide);
+  card.addEventListener('focusin',show);
+  card.addEventListener('focusout',hide);
+})();
 </script>
 </body>
 </html>
