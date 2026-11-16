@@ -857,16 +857,21 @@
       ==================================================== */
       var LEVELS = [
         null,
-        { cps: 1.6, fail: 0.55, tierMax: 1, label: "おさんぽ速度", desc: "Lv.1 ― かがみんはまだキーボードを探してる。余裕でしょ。" },
+        { cps: 1.6, fail: 0.55, tierMax: 1, label: "おさんぽ速度", desc: "Lv.1 ― わたしはまだキーボード見ないと打てないのよ。あんたも？" },
         { cps: 2.2, fail: 0.50, tierMax: 2, label: "のんびり", desc: "Lv.2 ― ちょっと慣れてきたみたい。でもまだまだ遅いわよ。" },
         { cps: 2.9, fail: 0.45, tierMax: 3, label: "ふつう", desc: "Lv.3 ― 一般人の平均くらい。油断すると抜かれるわよ。" },
         { cps: 3.6, fail: 0.40, tierMax: 4, label: "そこそこ", desc: "Lv.4 ― 事務仕事なら困らない速さ。ここから本番よ。" },
         { cps: 4.3, fail: 0.35, tierMax: 5, label: "速い", desc: "Lv.5 ― オフィスワーク上位の速さ。油断すると置いていかれるわよ。" },
         { cps: 5.0, fail: 0.30, tierMax: 6, label: "かなり速い", desc: "Lv.6 ― 秒間5打鍵。ミスしたら負けると思って。" },
-        { cps: 5.7, fail: 0.26, tierMax: 7, label: "エンジニア級", desc: "Lv.7 ― 打ち慣れたエンジニア並み。かがみん、本気出してきたわよ。" },
+        { cps: 5.7, fail: 0.26, tierMax: 7, label: "エンジニア級", desc: "Lv.7 ― 打ち慣れたエンジニア並み。私もそろそろ本気を出そうかしら。" },
         { cps: 6.4, fail: 0.22, tierMax: 8, label: "達人手前", desc: "Lv.8 ― 秒間6.4打鍵。達人クラスとほぼ互角の領域よ。" },
         { cps: 7.1, fail: 0.18, tierMax: 9, label: "達人", desc: "Lv.9 ― 秒間7打鍵超え。寿司打で大台に乗せる人の速さよ。" },
-        { cps: 7.8, fail: 0.14, tierMax: 10, label: "神速", desc: "Lv.10 ― 秒間7.8打鍵、つまずきも激減。勝てたら、間違いなく上級者よ。" }
+        { cps: 7.8, fail: 0.14, tierMax: 10, label: "神速", desc: "Lv.10 ― 秒間7.8打鍵、つまずきも激減。勝てたら、間違いなく上級者よ。" },
+        { cps: 8.5, fail: 0.11, tierMax: 10, label: "神速の先", desc: "Lv.11 ― 秒間8.5打鍵。つまずきはもう、ほとんど残ってないわ。" },
+        { cps: 9.2, fail: 0.09, tierMax: 10, label: "超高速", desc: "Lv.12 ― 秒間9.2打鍵。指の動きに残像がついてくる領域よ。" },
+        { cps: 9.9, fail: 0.07, tierMax: 10, label: "人間離れ", desc: "Lv.13 ― 秒間9.9打鍵。ここからは人間離れした世界よ。" },
+        { cps: 10.6, fail: 0.06, tierMax: 10, label: "鬼神", desc: "Lv.14 ― 秒間10.6打鍵。ミスひとつで置いていかれるわ。" },
+        { cps: 11.3, fail: 0.05, tierMax: 10, label: "最終形態", desc: "Lv.15 ― 秒間11.3打鍵、つまずきはほぼゼロ。これが私の本気よ。勝てたら、文句なしの最速よ。" }
       ];
 
       /* ================= 状態 ================= */
@@ -1677,7 +1682,9 @@
         showPose(resultStageInner, win ? "lose" : "victory");
         /* 吹き出し・「がーん」は画像に描き込み済みなので、ここでは重ねない */
         if (win) {
-          $("resultComment").textContent = state.level >= 9
+          $("resultComment").textContent = state.level >= 13
+            ? "Lv." + state.level + "のかがみんに勝つなんて…。もう人間離れしてるじゃない。その速さ、文句なしの最速よ。"
+            : state.level >= 9
             ? "Lv." + state.level + "のかがみんに勝つなんて…。その指さばき、プロ級じゃないの。参りました。"
             : "やられたわね…。でも次はレベル上げてくるから、覚悟しなさい。";
         } else {
