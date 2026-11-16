@@ -866,7 +866,7 @@
         { cps: 5.7, fail: 0.26, tierMax: 7, label: "エンジニア級", desc: "Lv.7 ― 打ち慣れたエンジニア並み。かがみん、本気出してきたわよ。" },
         { cps: 6.4, fail: 0.22, tierMax: 8, label: "達人手前", desc: "Lv.8 ― 秒間6.4打鍵。達人クラスとほぼ互角の領域よ。" },
         { cps: 7.1, fail: 0.18, tierMax: 9, label: "達人", desc: "Lv.9 ― 秒間7打鍵超え。寿司打で大台に乗せる人の速さよ。" },
-        { cps: 7.8, fail: 0.14, tierMax: 10, label: "神速", desc: "Lv.10 ― 秒間7.8打鍵、つまずきも激減。……勝てたら本物よ。" }
+        { cps: 7.8, fail: 0.14, tierMax: 10, label: "神速", desc: "Lv.10 ― 秒間7.8打鍵、つまずきも激減。勝てたら、間違いなく上級者よ。" }
       ];
 
       /* ================= 状態 ================= */
@@ -1683,7 +1683,7 @@
         } else {
           $("resultComment").textContent = state.level <= 2
             ? "ふふん、このレベルで負けるなんて。……まあ、練習あるのみよ。もう一戦どう？"
-            : "いい勝負だったわよ。あんたの速さは本物。でも今日のかがみんは止まらなかったの。";
+            : "いい勝負だったわよ。その速さは本物。でも今日のかがみんは止まらなかったの。";
         }
         $("statRounds").textContent = state.round;
         var total = state.totalKeys + state.totalMiss;
