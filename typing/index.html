@@ -216,16 +216,26 @@
       .kag-typed .stall { color: var(--danger); font-weight: 800; }
 
       .type-area { margin-top: 14px; }
-      .type-area label { display: block; font-size: 13px; font-weight: 800; color: var(--ink-soft); margin-bottom: 6px; }
-      #typeInput {
+      .type-area .type-label { display: block; font-size: 13px; font-weight: 800; color: var(--ink-soft); margin-bottom: 6px; }
+      /* 表示専用ボックス：入力欄ではないのでフォーカスを持たず、IMEの変換も始まらない。
+         打鍵は document の keydown で受け取り、打った文字をここへ映すだけ */
+      #typeDisplay {
         width: 100%; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: clamp(17px, 4.4vw, 22px);
         font-weight: 700; letter-spacing: .05em; padding: 14px 16px; border-radius: 12px;
-        border: 3px solid var(--line); background: var(--panel); color: var(--ink);
+        border: 3px solid var(--you); background: var(--panel); color: var(--ink);
+        min-height: 1.6em; word-break: break-all; user-select: none;
       }
-      #typeInput:focus { outline: none; border-color: var(--you); }
-      #typeInput.miss { border-color: var(--danger); animation: missShake .15s 2 alternate; }
+      #typeDisplay.idle { border-color: var(--line); opacity: .55; }
+      #typeDisplay .hint { color: var(--ink-soft); }
+      #typeDisplay .caret {
+        display: inline-block; width: 3px; height: 1em; margin-left: 2px; vertical-align: -0.12em;
+        background: var(--you); animation: caretBlink 1s steps(1) infinite;
+      }
+      #typeDisplay.idle .caret { display: none; }
+      @keyframes caretBlink { 50% { opacity: 0; } }
+      @media (prefers-reduced-motion: reduce) { #typeDisplay .caret { animation: none; } }
+      #typeDisplay.miss { border-color: var(--danger); animation: missShake .15s 2 alternate; }
       @keyframes missShake { from { transform: translateX(-4px); } to { transform: translateX(4px); } }
-      #typeInput:disabled { opacity: .55; }
       .type-meta { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-soft); font-weight: 700; margin-top: 6px; }
       .battle-actions { display: flex; gap: 10px; margin-top: 14px; }
       .ghost-btn {
@@ -280,7 +290,7 @@
         <div class="rules">
           <h2>ルール</h2>
           <ul>
-            <li>お題の文が表示されたら、<b>ローマ字</b>で入力。表示は漢字（ふりがな付き）、打つのは下に出るローマ字よ。「し＝shi / si」みたいに、よく使う綴りはどれでも通るわよ。IMEを切り替え忘れて<b>全角（ａｂｃ）で打っても、かなに変換されても大丈夫</b>、ローマ字として判定するわ（漢字に変換しちゃったらダメよ）。</li>
+            <li>お題の文が表示されたら、<b>ローマ字</b>で入力。表示は漢字（ふりがな付き）、打つのは下に出るローマ字よ。「し＝shi / si」みたいに、よく使う綴りはどれでも通るわよ。<b>入力欄はないから、そのままキーボードで打って</b>。IMEがオンでも変換候補は出ないし、確定操作もいらないわ。全角（ａｂｃ）で届いてもローマ字として判定するわよ。</li>
             <li>かがみんも同じ文を同時に打ち始める。<b>先に打ち切った方が1ポイント</b>。</li>
             <li>かがみんはたまに打ち間違えて止まる。その隙を逃さないこと。</li>
             <li><b>先に目標ポイント</b>を取った方の勝ち。</li>
@@ -344,8 +354,8 @@
           </div>
           <div class="kag-typed mono" id="kagTyped"></div>
           <div class="type-area">
-            <label for="typeInput">ここに入力（ローマ字・IMEオンでかなに変換されてもOK）</label>
-            <input id="typeInput" class="mono" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="カウントダウン後にここへ打って" disabled />
+            <span class="type-label">打った文字はここに出る（入力欄はないから、そのままキーボードで打って）</span>
+            <div id="typeDisplay" class="mono idle" aria-label="あなたが打った文字"><span id="typeDisplayText">カウントダウン後にそのまま打って</span><span class="caret" aria-hidden="true"></span></div>
             <div class="type-meta">
               <span id="missInfo">ミス 0</span>
               <span id="speedInfo"></span>
@@ -1336,17 +1346,18 @@
         $("roundBanner").className = "round-banner";
         $("missInfo").textContent = "ミス 0";
         $("speedInfo").textContent = "";
-        var input = $("typeInput");
-        input.value = "";
-        input.disabled = true;
-        composing = false; compBaseSet = false; /* 前ラウンドのIME変換状態を引き継がない */
-        input.placeholder = "よーい…";
+        display.classList.add("idle");
+        displayHint = "よーい…";
+        renderTypeDisplay();
         function beginRace() {
           state.racing = true;
           state.roundStartAt = Date.now();
-          input.disabled = false;
-          input.placeholder = state.sentence.ro;
-          input.focus();
+          display.classList.remove("idle");
+          displayHint = "そのまま打って！";
+          renderTypeDisplay();
+          /* ボタンにフォーカスが残っていると、対決中のSpace/Enterが
+             ボタンの再押しになってしまうので外しておく */
+          if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
           startKagamin();
         }
         /* 対決開始時のみカウントダウン（約3秒）を出す。
@@ -1538,11 +1549,28 @@
         flush();
         return out;
       }
-      var input = $("typeInput");
+      /* ================= あなたの入力（keydown方式） =================
+         入力欄（テキストフィールド）は置かない。対決中は document の
+         keydown で1打鍵ずつ受け取り、その場でマッチャに食わせて
+         正誤判定と進捗更新を行う。編集可能な要素がフォーカスを
+         持たないため、IMEの変換セッション自体が発生せず、変換候補
+         ウィンドウも確定操作も存在しない。表示専用ボックスには
+         打った文字を映すだけ。
+         保険は残す：環境によって打鍵が全角（ａ）や、かな1文字で
+         届いた場合は、従来どおり normalizeFullWidth / kanaToRomaji で
+         ローマ字に戻してから判定する */
+      var display = $("typeDisplay");
+      var displayText = $("typeDisplayText");
+      var displayHint = "カウントダウン後にそのまま打って";
+      function renderTypeDisplay() {
+        var t = matcherTyped();
+        if (t) { displayText.textContent = t; displayText.classList.remove("hint"); }
+        else { displayText.textContent = displayHint; displayText.classList.add("hint"); }
+      }
       function registerMiss(m) {
         state.totalMiss += m;
         state.roundMiss = (state.roundMiss || 0) + m;
-        input.classList.remove("miss"); void input.offsetWidth; input.classList.add("miss");
+        display.classList.remove("miss"); void display.offsetWidth; display.classList.add("miss");
         beep(160, 0.07, "square", 0.04);
         $("missInfo").textContent = "ミス " + (state.roundMiss || 0) + "（累計 " + state.totalMiss + "）";
       }
@@ -1553,79 +1581,45 @@
         if (accDelta > 0) { state.totalKeys += accDelta; beep(980, 0.02, "sine", 0.012); }
         state.roundKeys = matcherTyped().length;
         renderRomajiDisplay();
+        renderTypeDisplay();
         var elapsed = (Date.now() - state.roundStartAt) / 1000;
         if (elapsed > 0.5 && matcherTyped().length) $("speedInfo").textContent = "現在 " + (matcherTyped().length / elapsed).toFixed(1) + " 打鍵/秒";
         if (matcherDone()) finishRound("you");
       }
-      /* 通常の入力（IMEオフ／確定済みテキスト）の照合：
-         前回確定分との差分だけをマッチャに食わせる */
-      function processInput() {
-        if (!state.racing || state.roundOver) return;
-        var val = kanaToRomaji(normalizeFullWidth(input.value).toLowerCase());
-        var prevTyped = matcherTyped();
-        var accepted = 0, misses = 0, lastMissAt = -1, i;
-        if (val.indexOf(prevTyped) === 0) {
-          /* 追加された打鍵を1文字ずつマッチャに食わせる */
-          var news = val.slice(prevTyped.length);
-          for (i = 0; i < news.length; i++) { if (feedChar(news[i])) accepted++; else { misses++; lastMissAt = prevTyped.length + i; } }
-        } else {
-          /* 削除や途中編集があったら、最初から組み直して整合させる */
-          resetMatcher();
-          for (i = 0; i < val.length; i++) { if (feedChar(val[i])) accepted++; else { misses++; lastMissAt = i; } }
-        }
-        /* かな入力の途中（拗音の小さい字がまだ届いていない等）で、末尾の
-           1文字だけが合わないのは確定前の揺れなのでミスに数えない。
-           次の字が届けば正しく判定し直される */
-        if (misses === 1 && lastMissAt === val.length - 1 && /[ぁ-ゖァ-ヶー]$/.test(input.value)) misses = 0;
-        input.value = matcherTyped();
+      /* 1打鍵分の文字列を正規化してマッチャへ。かな1文字が届いた場合は
+         ローマ字が複数文字に展開されることがあるので、展開後の文字列を
+         1文字ずつ食わせる */
+      function feedKey(raw) {
+        var s = kanaToRomaji(normalizeFullWidth(raw).toLowerCase());
+        var accepted = 0, misses = 0;
+        for (var i = 0; i < s.length; i++) { if (feedChar(s[i])) accepted++; else misses++; }
         afterFeed(accepted, misses);
       }
-      /* ===== IME変換中（composition）の扱い =====
-         変換中は入力欄の文字列をIMEが握っているため、こちらから
-         input.value を書き換えると変換セッションが壊れてしまう。
-         変換中は書き戻しをせず、届いたかな文字列をローマ字に読み替えて
-         組み直し照合だけ行う（集計はしない。打ち間違いは変換中に
-         直せるため）。確定した時点で、変換開始時点から増えた分だけを
-         打鍵数・ミスとしてまとめて集計する */
-      var composing = false, compBaseSet = false, compBaseTyped = 0;
-      function beginComposition() {
-        if (!compBaseSet) { compBaseSet = true; compBaseTyped = matcherTyped().length; }
-        composing = true;
-      }
-      function processComposition() {
-        var val = kanaToRomaji(normalizeFullWidth(input.value).toLowerCase());
+      /* Backspace：最後に正解した1文字を取り消す。マッチャに巻き戻しは
+         無いので、正解済み文字列を1文字短くして再生し直す（決定的に
+         同じ状態へ戻る）。すでに数えたミスは取り消さない */
+      function undoLastKey() {
+        var t = matcherTyped();
+        if (!t) return;
+        var nt = t.slice(0, -1);
         resetMatcher();
-        for (var i = 0; i < val.length; i++) feedChar(val[i]);
+        for (var i = 0; i < nt.length; i++) feedChar(nt[i]);
         state.roundKeys = matcherTyped().length;
         renderRomajiDisplay();
-        var elapsed = (Date.now() - state.roundStartAt) / 1000;
-        if (elapsed > 0.5 && matcherTyped().length) $("speedInfo").textContent = "現在 " + (matcherTyped().length / elapsed).toFixed(1) + " 打鍵/秒";
-        if (matcherDone()) finishRound("you");
+        renderTypeDisplay();
       }
-      function finalizeComposition() {
+      document.addEventListener("keydown", function (e) {
         if (!state.racing || state.roundOver) return;
-        var val = kanaToRomaji(normalizeFullWidth(input.value).toLowerCase());
-        resetMatcher();
-        var accepted = 0, misses = 0;
-        for (var i = 0; i < val.length; i++) { if (feedChar(val[i])) accepted++; else misses++; }
-        input.value = matcherTyped();
-        afterFeed(Math.max(0, accepted - compBaseTyped), misses);
-      }
-      input.addEventListener("compositionstart", function () { beginComposition(); });
-      input.addEventListener("compositionend", function () {
-        composing = false;
-        if (compBaseSet) { compBaseSet = false; finalizeComposition(); }
-      });
-      input.addEventListener("input", function (e) {
-        if (!state.racing || state.roundOver) return;
-        if (composing || e.isComposing) { beginComposition(); processComposition(); return; }
-        /* compositionend が来ない環境向け：変換中フラグが残っていたら確定処理を先に済ませる */
-        if (compBaseSet) { compBaseSet = false; finalizeComposition(); return; }
-        processInput();
-      });
-      input.addEventListener("keydown", function (e) {
-        if (composing || e.isComposing || e.key === "Process" || e.keyCode === 229) return; /* IME変換中のキーは横取りしない */
-        if (e.key === " ") e.preventDefault(); /* スペースでスクロールさせない */
+        var tgt = e.target;
+        if (tgt && (tgt.tagName === "INPUT" || tgt.tagName === "TEXTAREA" || tgt.isContentEditable)) return;
+        if (e.metaKey || e.ctrlKey || e.altKey) return; /* ショートカットは横取りしない */
+        if (e.isComposing || e.key === "Process" || e.keyCode === 229) return; /* 万一IMEが掴んでいるキーは対象外（通常は発生しない） */
+        if (e.key === "Backspace") { e.preventDefault(); undoLastKey(); return; }
+        if (e.key === "Tab" || e.key === "Enter") { e.preventDefault(); return; } /* フォーカス移動・ボタンの誤押し防止 */
+        if (e.key === " ") { e.preventDefault(); return; } /* スペースはお題に無いので無視（スクロール・ボタン押し防止） */
+        if (!e.key || e.key.length !== 1) return;
+        e.preventDefault();
+        feedKey(e.key);
       });
 
       /* ================= ラウンド終了 ================= */
@@ -1635,7 +1629,7 @@
         state.racing = false;
         clearInterval(state.kagTimer);
         stopTypingAnim();
-        input.disabled = true;
+        display.classList.add("idle");
         battleStage.classList.remove("stalled");
         var elapsed = (Date.now() - state.roundStartAt) / 1000;
 
