@@ -84,11 +84,15 @@ nav a{border-bottom:3px solid transparent;padding-bottom:2px}nav a.cur{border-co
 /* タイピングカードの「のぞき見かがみん」 */
 .card.peek-card{position:relative;overflow:hidden}
 .card.peek-card .peek{position:absolute;right:0;bottom:0;width:118px;max-width:45%;
-  transform:translateX(103%);transition:transform .55s cubic-bezier(.25,.9,.3,1.12);
-  pointer-events:none;user-select:none;-webkit-user-drag:none}
-.card.peek-card:hover .peek,.card.peek-card:focus-within .peek{transform:translateX(7%)}
+  transform:translateX(103%);pointer-events:none;user-select:none;-webkit-user-drag:none}
+.card.peek-card:hover .peek,.card.peek-card:focus-within .peek{animation:peekIn 3.6s forwards}
+@keyframes peekIn{
+  0%{transform:translateX(103%);animation-timing-function:cubic-bezier(.25,.9,.3,1.12)}
+  15%{transform:translateX(7%)}
+  85%{transform:translateX(7%);animation-timing-function:cubic-bezier(.25,.9,.3,1.12)}
+  100%{transform:translateX(103%)}}
 @media (hover:none){.card.peek-card .peek{transform:translateX(58%)}}
-@media (prefers-reduced-motion:reduce){.card.peek-card .peek{transition:none}}
+@media (prefers-reduced-motion:reduce){.card.peek-card:hover .peek,.card.peek-card:focus-within .peek{animation:none;transform:translateX(7%)}}
 </style>
 </head>
 <body>
