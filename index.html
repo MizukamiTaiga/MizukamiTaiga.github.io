@@ -79,6 +79,17 @@ nav a{border-bottom:3px solid transparent;padding-bottom:2px}nav a.cur{border-co
 {"@context":"https://schema.org","@type":"Person","name":"水上大河","alternateName":"Taiga Mizukami","url":"https://mizukamitaiga.github.io/","image":"https://mizukamitaiga.github.io/assets/github-avatar.jpg","jobTitle":"Graduate Student Researcher","affiliation":{"@type":"CollegeOrUniversity","name":"山梨大学大学院","alternateName":"University of Yamanashi"},"alumniOf":{"@type":"CollegeOrUniversity","name":"University of Yamanashi"},"address":{"@type":"PostalAddress","addressLocality":"甲府市","addressRegion":"山梨県","addressCountry":"JP"},"knowsAbout":["Wearable Self-Localization","Visual Landmarks","Pedestrian Dead Reckoning","Computer Vision","Microphone Array","Acoustic Sensing","Assistive Technology","Blender","Virtual Tourism VFX"],"sameAs":["https://github.com/MizukamiTaiga"]}
 </script>
 <!-- /SEO -->
+
+<style>
+/* タイピングカードの「のぞき見かがみん」 */
+.card.peek-card{position:relative;overflow:hidden}
+.card.peek-card .peek{position:absolute;right:0;bottom:0;width:118px;max-width:45%;
+  transform:translateX(103%);transition:transform .55s cubic-bezier(.25,.9,.3,1.12);
+  pointer-events:none;user-select:none;-webkit-user-drag:none}
+.card.peek-card:hover .peek,.card.peek-card:focus-within .peek{transform:translateX(7%)}
+@media (hover:none){.card.peek-card .peek{transform:translateX(58%)}}
+@media (prefers-reduced-motion:reduce){.card.peek-card .peek{transition:none}}
+</style>
 </head>
 <body>
 <canvas id="bgParticles" aria-hidden="true"></canvas>
@@ -125,7 +136,7 @@ nav a{border-bottom:3px solid transparent;padding-bottom:2px}nav a.cur{border-co
 <article class="card"><h3>バーチャル観光VFXプロジェクト</h3><p>固定カメラで撮影した観光地の実写映像（10〜30秒）に、トゥーン表現の3Dご当地キャラクターを合成し、自治体・企業向けの観光PRコンテンツとして届ける取り組みです。</p><p>最初の実例として、実写映像とオリジナルキャラクター「巡」を合成した10秒作品を制作。制作では Blender を中心に、将来的な展開として Unreal Engine 5 も視野に入れています。</p><div class="tags"><span class="tag">Blender</span><span class="tag">VFX Compositing</span><span class="tag">Toon Rendering</span><span class="tag">Tourism PR</span></div></article>
 <article class="card"><h3>研究用計測・記録システム</h3><p>屋外実験のための多センサー同時記録に取り組んでいます。カメラ、RealSense、マイクアレイ、IMU を組み合わせ、歩行・車両通過などの場面を再現可能に記録し、後から評価できる形に整えます。</p><div class="tags"><span class="tag">RealSense</span><span class="tag">ReSpeaker 6ch</span><span class="tag">IMU</span><span class="tag">Ubuntu</span></div></article>
 <article class="card"><h3>業務効率化ツールづくり</h3><p>アルバイト先の現場で実際に使われる小さな自動化ツールも作ってきました。現場の手間を一つずつ減らす、実務寄りのものづくりが好きです。</p><div class="tags"><span class="tag">Automation</span><span class="tag">Google Apps Script</span><span class="tag">現場改善</span></div></article>
-<article class="card"><h3>かがみんタイピング対決</h3><p>タイピングで「かがみん」と対決できるブラウザゲーム。お題は全400種類からランダム出題。あなたのタイピング速度で勝負が決まります。</p><p><a href="typing/">▶ 遊んでみる</a></p><div class="tags"><span class="tag">Browser Game</span><span class="tag">Typing</span></div></article>
+<article class="card peek-card"><h3>かがみんタイピング対決</h3><p>タイピングで「かがみん」と対決できるブラウザゲーム。お題は全400種類からランダム出題。あなたのタイピング速度で勝負が決まります。</p><p><a href="typing/">▶ 遊んでみる</a></p><div class="tags"><span class="tag">Browser Game</span><span class="tag">Typing</span></div><img class="peek" src="assets/kagamin-peek.png" alt=""></article>
 </div>
 </section>
 
