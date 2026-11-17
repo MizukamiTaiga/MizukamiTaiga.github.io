@@ -296,9 +296,12 @@
         border: 1px solid var(--line); border-radius: 7px; background: var(--bg);
         font-size: 13px; font-weight: 700; color: var(--ink-soft);
       }
-      .kb-key.h1 { background: color-mix(in srgb, var(--danger) 16%, var(--panel)); color: var(--ink); border-color: var(--danger); }
-      .kb-key.h2 { background: color-mix(in srgb, var(--danger) 38%, var(--panel)); color: var(--ink); border-color: var(--danger); }
-      .kb-key.h3 { background: var(--danger); color: #fff; border-color: var(--danger); }
+      /* 苦手キーの色はJSがミス回数に比例した濃さでインライン指定する（グラデーション） */
+      .kb-legend { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 11px; font-weight: 700; color: var(--ink-soft); }
+      .kb-legend .grad {
+        flex: 1; height: 8px; border-radius: 999px; border: 1px solid var(--line);
+        background: linear-gradient(to right, color-mix(in srgb, var(--danger) 10%, var(--panel)), var(--danger));
+      }
       .weak-list { margin: 12px 0 0; padding: 0; list-style: none; display: grid; gap: 7px; }
       .weak-list li { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; }
       .weak-list .wk {
@@ -1958,6 +1961,15 @@
         if (!weak.length) {
           html += '<p class="note" style="margin:0">ミスしたキーはないわ。完璧ね。</p>';
         } else {
+          /* 色の濃さはミス回数に比例（グラデーション）。6回で最も濃く、
+             それ以上ミスしたキーがあれば最大値に合わせて広げる */
+          var denom = Math.max(6, weak[0].miss);
+          function heatPct(m) { return Math.round(10 + 90 * Math.min(1, m / denom)); }
+          function heatStyle(m) {
+            if (!m) return "";
+            var pct = heatPct(m);
+            return ' style="background:color-mix(in srgb, var(--danger) ' + pct + '%, var(--panel));border-color:var(--danger);color:' + (pct >= 70 ? "#fff" : "var(--ink)") + '"';
+          }
           var rows = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
           html += '<div class="kb" aria-hidden="true">';
           rows.forEach(function (row, ri) {
@@ -1965,27 +1977,26 @@
             row.split("").forEach(function (ch) {
               var ks = state.keyStats[ch];
               var m = ks ? ks.miss : 0;
-              var cls = m >= 6 ? "h3" : m >= 3 ? "h2" : m >= 1 ? "h1" : "";
-              html += '<span class="kb-key mono ' + cls + '">' + ch.toUpperCase() + '</span>';
+              html += '<span class="kb-key mono"' + heatStyle(m) + '>' + ch.toUpperCase() + '</span>';
             });
             if (ri === 0) {
               var ksh = state.keyStats["-"];
               var mh = ksh ? ksh.miss : 0;
-              var clsh = mh >= 6 ? "h3" : mh >= 3 ? "h2" : mh >= 1 ? "h1" : "";
-              html += '<span class="kb-key mono ' + clsh + '">-</span>';
+              html += '<span class="kb-key mono"' + heatStyle(mh) + '>-</span>';
             }
             html += '</div>';
           });
           html += '</div>';
+          html += '<div class="kb-legend" aria-hidden="true"><span>ミス少</span><span class="grad"></span><span>ミス多</span></div>';
           html += '<ul class="weak-list">';
           weak.slice(0, 5).forEach(function (x) {
             var rate = x.att ? Math.round(x.miss / x.att * 100) : 0;
-            html += '<li><span class="wk mono">' + escHtml(x.key.toUpperCase()) + '</span>' +
-              '<span class="weak-bar"><i style="width:' + rate + '%"></i></span>' +
+            html += '<li><span class="wk mono"' + heatStyle(x.miss) + '>' + escHtml(x.key.toUpperCase()) + '</span>' +
+              '<span class="weak-bar"><i style="width:' + rate + '%;background:color-mix(in srgb, var(--danger) ' + heatPct(x.miss) + '%, var(--panel))"></i></span>' +
               '<span class="wv">ミス ' + x.miss + '回 ／ ' + x.att + '打鍵中（' + rate + '%）</span></li>';
           });
           html += '</ul>';
-          html += '<p class="note">キーボードの色はミス回数、「次に打つべき文字」を打ち損じた回数で集計してるわ。</p>';
+          html += '<p class="note">色の濃さはミス回数に比例してるわ（濃いほど苦手）。「次に打つべき文字」を打ち損じた回数で集計してるわ。</p>';
         }
         html += '</div>';
 
