@@ -214,6 +214,7 @@
       .track .runner { position: absolute; top: 50%; transform: translate(-50%, -50%); font-size: 13px; transition: left .12s linear; }
       .kag-typed { font-size: 13px; color: var(--ink-soft); text-align: right; min-height: 1.3em; }
       .kag-typed .stall { color: var(--danger); font-weight: 800; }
+      .kag-typed .reading { color: var(--kag); font-weight: 700; }
 
       .type-area { margin-top: 14px; }
       .type-area .type-label { display: block; font-size: 13px; font-weight: 800; color: var(--ink-soft); margin-bottom: 6px; }
@@ -291,7 +292,7 @@
           <h2>ルール</h2>
           <ul>
             <li>お題の文が表示されたら、<b>ローマ字</b>で入力。表示は漢字（ふりがな付き）、打つのは下に出るローマ字よ。「し＝shi / si」みたいに、よく使う綴りはどれでも通るわよ。<b>入力欄はないから、そのままキーボードで打って</b>。IMEがオンでも変換候補は出ないし、確定操作もいらないわ。全角（ａｂｃ）で届いてもローマ字として判定するわよ。</li>
-            <li>かがみんも同じ文を同時に打ち始める。<b>先に打ち切った方が1ポイント</b>。</li>
+            <li>かがみんも<b>お題を見てから</b>打ち始める。文が表示された瞬間に打ち出すことはなく、<b>文の長さに応じた「読む時間」</b>がかかってからスタートする（下の「かがみん: お題を読んでる…」表示が合図）。あんたが読むのにかかる時間と同じで、知ってたみたいに先行することはないわ。<b>先に打ち切った方が1ポイント</b>。</li>
             <li>かがみんはたまに打ち間違えて止まる。その隙を逃さないこと。</li>
             <li><b>先に目標ポイント</b>を取った方の勝ち。</li>
           </ul>
@@ -896,6 +897,9 @@
         racing: false,
         roundOver: false,
         kagPos: 0,          /* かがみんの入力済み文字数（小数） */
+        kagReadyAt: 0,      /* かがみんがお題を読み終える時刻（この時刻まで打たない） */
+        kagReadingMs: 0,    /* 今回の「読む時間」の長さ */
+        kagHasStarted: false, /* 読む時間を終えて打ち始めたか */
         kagStallUntil: 0,   /* つまずき終了時刻 */
         kagTimer: null,
         kagDeadlines: [],   /* 各ローマ字文字が打ち終わる累積時刻（アクティブ時間ms） */
@@ -1381,12 +1385,31 @@
         nextRound(true);
       }
 
+      /* かがみんの「読む時間」：文が表示された瞬間には打ち出さず、
+         人が文面を目で追ってから打ち始めるのと同じだけ待つ。
+         長い文ほど読むのに時間がかかり、レベルが上がると
+         少しだけ速く読み終える（それでもゼロにはならない） */
+      function computeKagReadingMs(roLen) {
+        var base = 600;              /* 文に目を向けるまでの反応時間 */
+        var perChar = 28;            /* ローマ字1文字あたりの目を通す時間 */
+        var jitter = Math.random() * 400; /* 毎回少しばらつく */
+        var speedUp = Math.min(0.35, (state.level - 1) * 0.025); /* Lvが上がるほど最大35%短縮 */
+        var ms = (base + perChar * roLen + jitter) * (1 - speedUp);
+        return Math.max(450, Math.round(ms));
+      }
+
       function nextRound(withCountdown) {
         state.round++;
         state.roundOver = false;
         state.racing = false;
         state.sentence = pickSentence();
         state.kagPos = 0;
+        /* お題が決まったこの瞬間から、かがみんの「読む時間」が始まる。
+           カウントダウン中も読んでいる扱いになるので、初回だけ
+           二重に待たされることはない */
+        state.kagReadingMs = computeKagReadingMs(state.sentence.ro.length);
+        state.kagReadyAt = Date.now() + state.kagReadingMs;
+        state.kagHasStarted = false;
         state.kagStallUntil = 0;
         state.kagDeadlines = [];
         state.kagDurations = [];
@@ -1397,6 +1420,7 @@
         renderScore();
         renderSentence();
         setFace("");
+        $("kagTyped").innerHTML = '<span class="reading">かがみん: お題を読んでる…</span>';
         battleStage.classList.remove("stalled");
         $("roundBanner").textContent = "";
         $("roundBanner").className = "round-banner";
@@ -1510,18 +1534,43 @@
         return deadlines.length;
       }
 
-      /* かがみんのタイピング：文ごとに決めた可変ペースで進み、ランダムにつまずく */
+      /* かがみんのタイピング：まず「読む時間」だけ待ってから、
+         文ごとに決めた可変ペースで進み、ランダムにつまずく */
       function startKagamin() {
         var lv = LEVELS[state.level];
         clearInterval(state.kagTimer);
         kagStalledNow = false;
         buildKagSchedule();
         state.kagLastNow = Date.now();
-        startTypingAnim();
+        /* 読み終えていない間はタイピングポーズにしない（待機ポーズのまま） */
+        if (Date.now() >= state.kagReadyAt) {
+          state.kagHasStarted = true;
+          startTypingAnim();
+        } else {
+          stopTypingAnim();
+          showPose(battleStage, "standby");
+          $("kagTyped").innerHTML = '<span class="reading">かがみん: お題を読んでる…</span>';
+        }
         state.kagTimer = setInterval(function () {
           if (!state.racing || state.roundOver) return;
           var now = Date.now();
           var len = state.sentence.ro.length;
+          if (now < state.kagReadyAt) {
+            /* 読む時間：ペースの時計を進めず、進捗バーも動かさない。
+               ユーザーはこの間も自由に打ち始められる（読むのが速い方が先行する） */
+            state.kagLastNow = now;
+            state.kagActiveMs = 0;
+            state.kagPos = 0;
+            $("fillKag").style.width = "0%";
+            $("kagTyped").innerHTML = '<span class="reading">かがみん: お題を読んでる…</span>';
+            return;
+          }
+          if (!state.kagHasStarted) {
+            /* 読み終えた瞬間：ここから初めて指が動き出す */
+            state.kagHasStarted = true;
+            state.kagLastNow = now;
+            startTypingAnim();
+          }
           if (now < state.kagStallUntil) {
             /* つまずき中はペースの時計も止める：経過時間に加算しない */
             state.kagLastNow = now;
