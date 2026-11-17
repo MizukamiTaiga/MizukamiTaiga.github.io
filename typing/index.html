@@ -269,7 +269,60 @@
       .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; text-align: center; box-shadow: var(--shadow); }
       .stat .v { font-size: 24px; font-weight: 800; }
       .stat .k { font-size: 12px; font-weight: 700; color: var(--ink-soft); margin-top: 2px; }
-      .result-actions { display: grid; gap: 10px; }
+      .result-actions { display: grid; gap: 10px; margin-top: 12px; }
+      /* ---------- result detail ---------- */
+      .detail-btn {
+        width: 100%; border: 2px solid var(--kag); background: var(--panel); color: var(--kag);
+        border-radius: 12px; font-family: inherit; font-size: 15px; font-weight: 800;
+        padding: 12px; cursor: pointer; min-height: 48px;
+      }
+      .detail-btn:hover { background: var(--kag-soft); }
+      .detail-panel {
+        margin-top: 12px; background: var(--panel); border: 1px solid var(--line);
+        border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 16px 6px;
+      }
+      .d-sec { margin-bottom: 18px; }
+      .d-sec h3 { font-size: 15px; font-weight: 800; margin: 0 0 10px; }
+      .d-sec .note { font-size: 12px; color: var(--ink-soft); font-weight: 500; margin: 8px 0 0; line-height: 1.6; }
+      .d-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+      @media (max-width: 560px) { .d-stats { grid-template-columns: repeat(2, 1fr); } }
+      .d-stats .stat { box-shadow: none; }
+      .kb { display: grid; gap: 5px; }
+      .kb-row { display: flex; gap: 5px; }
+      .kb-row.off1 { padding: 0 4%; }
+      .kb-row.off2 { padding: 0 8%; }
+      .kb-key {
+        flex: 1 1 0; min-width: 0; text-align: center; padding: 7px 0 6px;
+        border: 1px solid var(--line); border-radius: 7px; background: var(--bg);
+        font-size: 13px; font-weight: 700; color: var(--ink-soft);
+      }
+      .kb-key.h1 { background: color-mix(in srgb, var(--danger) 16%, var(--panel)); color: var(--ink); border-color: var(--danger); }
+      .kb-key.h2 { background: color-mix(in srgb, var(--danger) 38%, var(--panel)); color: var(--ink); border-color: var(--danger); }
+      .kb-key.h3 { background: var(--danger); color: #fff; border-color: var(--danger); }
+      .weak-list { margin: 12px 0 0; padding: 0; list-style: none; display: grid; gap: 7px; }
+      .weak-list li { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; }
+      .weak-list .wk {
+        min-width: 34px; text-align: center; padding: 3px 0; border: 1px solid var(--danger);
+        border-radius: 7px; color: var(--danger); font-size: 15px;
+      }
+      .weak-bar { flex: 1; height: 8px; background: var(--bg); border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+      .weak-bar i { display: block; height: 100%; background: var(--danger); }
+      .weak-list .wv { font-size: 13px; color: var(--ink-soft); white-space: nowrap; }
+      .round-rec { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
+      .rr-head { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 13px; font-weight: 800; color: var(--ink-soft); align-items: baseline; }
+      .rr-head .rr-no { color: var(--ink); font-size: 14px; }
+      .rr-res.you { color: var(--you); }
+      .rr-res.kag { color: var(--kag); }
+      .rr-head .rr-ok { color: var(--ok); }
+      .rr-jp { font-size: 16px; font-weight: 700; margin-top: 5px; line-height: 1.6; }
+      .rr-ro { font-size: 15px; letter-spacing: .04em; margin-top: 2px; word-break: break-all; line-height: 2.0; }
+      .rr-ro .rest { color: var(--ink-soft); opacity: .5; }
+      .rr-ro .mm {
+        color: var(--danger); font-weight: 700; padding: 0 1px; border-radius: 3px;
+        background: color-mix(in srgb, var(--danger) 14%, transparent);
+        border-bottom: 3px solid var(--danger);
+      }
+      .rr-ro .mm sup { font-size: 10px; font-weight: 800; }
       .again-btn {
         border: none; border-radius: 14px; background: var(--accent); color: var(--accent-ink);
         font-family: inherit; font-size: 18px; font-weight: 800; padding: 15px; cursor: pointer; box-shadow: var(--shadow);
@@ -381,6 +434,10 @@
           <div class="stat"><div class="v mono" id="statAcc">―</div><div class="k">あなたの正確率</div></div>
           <div class="stat"><div class="v mono" id="statKps">―</div><div class="k">あなたの平均打鍵/秒</div></div>
           <div class="stat"><div class="v mono" id="statLevel">―</div><div class="k">レベル</div></div>
+        </div>
+        <button type="button" class="detail-btn" id="detailBtn" aria-expanded="false" aria-controls="detailPanel">詳細を開く</button>
+        <div class="detail-panel" id="detailPanel" hidden>
+          <div id="detailBody"></div>
         </div>
         <div class="result-actions">
           <button type="button" class="again-btn" id="rematchBtn">もう一戦（同じ設定）</button>
@@ -911,7 +968,13 @@
         roundKeys: 0,
         roundMiss: 0,
         roundTimes: [],     /* あなたが打ち切ったラウンドの所要秒 */
-        winLens: []         /* あなたが打ち切ったラウンドの文長 */
+        winLens: [],        /* あなたが打ち切ったラウンドの文長 */
+        /* --- 詳細表示用の集計（結果画面の「詳細を開く」で使う） --- */
+        keyStats: {},       /* 次に打つべき文字 → { att: 打鍵数, miss: ミス数 }（苦手キー集計） */
+        roundMissMarks: [], /* 今のラウンドのミス位置 { pos: 打ち済み文字数, expected: 期待した文字 } */
+        roundRecords: [],   /* 終わったラウンドの記録（文・勝敗・時間・ミス位置） */
+        streak: 0,          /* 現在の連続正解数 */
+        maxStreak: 0        /* 最大連続正解数 */
       };
 
       var $ = function (id) { return document.getElementById(id); };
@@ -1277,6 +1340,20 @@
         $("fillYou").style.width = (matcherProgress() * 100) + "%";
         updateSegProgress();
       }
+      /* renderRomajiDisplay と同じ組み立てで、表示用ローマ字文字列だけを返す
+         （詳細表示でラウンド記録に残すため） */
+      function currentDispString() {
+        var typed = matcherTyped();
+        var disp = typed;
+        if (!matcherDone()) {
+          var st = bestState();
+          var cands = candidatesFor(matcher.units, st.idx).filter(function (x) { return x.indexOf(st.buffer) === 0; });
+          var cand = cands.length ? cands[0] : "";
+          disp += cand.slice(st.buffer.length);
+          for (var i = st.idx + 1; i < matcher.units.length; i++) disp += canonicalRomaji(matcher.units, i);
+        }
+        return disp;
+      }
 
       function pickSentence() {
         /* 完全ランダム：レベル帯で絞らず全400種類から一様抽選する。
@@ -1378,6 +1455,8 @@
       function startMatch() {
         state.scoreYou = 0; state.scoreKag = 0; state.round = 0;
         state.totalKeys = 0; state.totalMiss = 0; state.roundTimes = []; state.winLens = [];
+        state.keyStats = {}; state.roundMissMarks = []; state.roundRecords = [];
+        state.streak = 0; state.maxStreak = 0;
         state.lastSentenceRo = "";
         showScreen("battle");
         renderScore();
@@ -1409,6 +1488,7 @@
         state.kagLastNow = 0;
         state.roundKeys = 0;
         state.roundMiss = 0;
+        state.roundMissMarks = [];
         renderScore();
         renderSentence();
         setFace("");
@@ -1686,10 +1766,38 @@
       /* 1打鍵分の文字列を正規化してマッチャへ。かな1文字が届いた場合は
          ローマ字が複数文字に展開されることがあるので、展開後の文字列を
          1文字ずつ食わせる */
+      /* 次に打つべき文字（表示に使っている標準綴り基準の先頭候補）。
+         苦手キーの集計に使う。解釈が複数ある時は表示と同じ先頭候補で代表させる */
+      function expectedNextChar() {
+        if (matcherDone() || !matcher.units.length) return null;
+        var st = bestState();
+        if (st.idx >= matcher.units.length) return null;
+        var cands = candidatesFor(matcher.units, st.idx).filter(function (x) { return x.indexOf(st.buffer) === 0; });
+        if (!cands.length) return null;
+        var rest = cands[0].slice(st.buffer.length);
+        return rest ? rest.charAt(0) : null;
+      }
       function feedKey(raw) {
         var s = kanaToRomaji(normalizeFullWidth(raw).toLowerCase());
         var accepted = 0, misses = 0;
-        for (var i = 0; i < s.length; i++) { if (feedChar(s[i])) accepted++; else misses++; }
+        for (var i = 0; i < s.length; i++) {
+          var exp = expectedNextChar();
+          var ok = feedChar(s[i]);
+          if (exp) {
+            var ks = state.keyStats[exp] || (state.keyStats[exp] = { att: 0, miss: 0 });
+            ks.att++;
+            if (!ok) ks.miss++;
+          }
+          if (ok) {
+            accepted++;
+            state.streak++;
+            if (state.streak > state.maxStreak) state.maxStreak = state.streak;
+          } else {
+            misses++;
+            state.streak = 0;
+            if (exp) state.roundMissMarks.push({ pos: matcherTyped().length, expected: exp });
+          }
+        }
         afterFeed(accepted, misses);
       }
       /* Backspace：最後に正解した1文字を取り消す。マッチャに巻き戻しは
@@ -1729,6 +1837,22 @@
         display.classList.add("idle");
         battleStage.classList.remove("stalled");
         var elapsed = (Date.now() - state.roundStartAt) / 1000;
+
+        /* 詳細表示用に、このラウンドの記録を残す（勝敗どちらでも）。
+           disp は「実際に打った綴り＋残りの標準綴り」で、ミス位置は
+           その文字列のインデックスで持つ */
+        var marksAgg = {};
+        state.roundMissMarks.forEach(function (m) { marksAgg[m.pos] = (marksAgg[m.pos] || 0) + 1; });
+        state.roundRecords.push({
+          no: state.round,
+          jpText: state.sentence.d.map(function (seg) { return seg[0]; }).join(""),
+          disp: currentDispString(),
+          typedLen: matcherTyped().length,
+          winner: winner,
+          elapsed: elapsed,
+          miss: state.roundMiss || 0,
+          marks: marksAgg
+        });
 
         if (winner === "you") {
           state.scoreYou++;
@@ -1784,11 +1908,123 @@
           if (tt > 0) $("statKps").textContent = (k / tt).toFixed(1);
         }
         $("statLevel").textContent = "Lv." + state.level;
+        buildDetails();
+        /* 詳細は閉じた状態で出す（開くのはボタンを押した時だけ） */
+        $("detailPanel").hidden = true;
+        $("detailBtn").textContent = "詳細を開く";
+        $("detailBtn").setAttribute("aria-expanded", "false");
+      }
+
+      /* ================= 結果の詳細（画面遷移なしで開閉） ================= */
+      function escHtml(s) {
+        return String(s).replace(/[&<>"']/g, function (c) {
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+        });
+      }
+      function dStat(v, k) {
+        return '<div class="stat"><div class="v mono">' + v + '</div><div class="k">' + k + '</div></div>';
+      }
+      function buildDetails() {
+        var recs = state.roundRecords;
+        var totalTyped = 0, totalTime = 0, wins = 0;
+        recs.forEach(function (r) {
+          totalTyped += r.typedLen;
+          totalTime += r.elapsed;
+          if (r.winner === "you") wins++;
+        });
+        var totalAtt = state.totalKeys + state.totalMiss;
+        var wpm = totalTime > 0 ? (totalTyped / 5) / (totalTime / 60) : 0;
+        var kpsAll = totalTime > 0 ? totalTyped / totalTime : 0;
+
+        var html = "";
+        /* --- タイピング能力 --- */
+        html += '<div class="d-sec"><h3>タイピング能力</h3><div class="d-stats">';
+        html += dStat(totalTime > 0 ? Math.round(wpm) : "―", "WPM（単語/分）");
+        html += dStat(totalTime > 0 ? kpsAll.toFixed(1) : "―", "打鍵/秒（全ラウンド）");
+        html += dStat(totalAtt, "総打鍵数");
+        html += dStat(state.totalMiss, "ミス数");
+        html += dStat(totalAtt ? (state.totalKeys / totalAtt * 100).toFixed(1) + "%" : "―", "正確率");
+        html += dStat(state.maxStreak, "最大連続正解");
+        html += dStat(wins + " / " + recs.length, "取ったラウンド");
+        html += dStat(totalTime.toFixed(1) + "秒", "合計タイム");
+        html += '</div><p class="note">WPMは「正しく打った文字数 ÷ 5 ÷ かかった分数」。e-タイピング等と同じ数え方よ。全ラウンド（負けたラウンドで打った分も含む）で計算してるわ。</p></div>';
+
+        /* --- 苦手キー --- */
+        html += '<div class="d-sec"><h3>苦手キー</h3>';
+        var weak = Object.keys(state.keyStats)
+          .map(function (k) { return { key: k, att: state.keyStats[k].att, miss: state.keyStats[k].miss }; })
+          .filter(function (x) { return x.miss > 0; })
+          .sort(function (a, b) { return b.miss - a.miss || (b.miss / b.att) - (a.miss / a.att); });
+        if (!weak.length) {
+          html += '<p class="note" style="margin:0">ミスしたキーはないわ。完璧ね。</p>';
+        } else {
+          var rows = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
+          html += '<div class="kb" aria-hidden="true">';
+          rows.forEach(function (row, ri) {
+            html += '<div class="kb-row' + (ri === 1 ? " off1" : ri === 2 ? " off2" : "") + '">';
+            row.split("").forEach(function (ch) {
+              var ks = state.keyStats[ch];
+              var m = ks ? ks.miss : 0;
+              var cls = m >= 6 ? "h3" : m >= 3 ? "h2" : m >= 1 ? "h1" : "";
+              html += '<span class="kb-key mono ' + cls + '">' + ch.toUpperCase() + '</span>';
+            });
+            if (ri === 0) {
+              var ksh = state.keyStats["-"];
+              var mh = ksh ? ksh.miss : 0;
+              var clsh = mh >= 6 ? "h3" : mh >= 3 ? "h2" : mh >= 1 ? "h1" : "";
+              html += '<span class="kb-key mono ' + clsh + '">-</span>';
+            }
+            html += '</div>';
+          });
+          html += '</div>';
+          html += '<ul class="weak-list">';
+          weak.slice(0, 5).forEach(function (x) {
+            var rate = x.att ? Math.round(x.miss / x.att * 100) : 0;
+            html += '<li><span class="wk mono">' + escHtml(x.key.toUpperCase()) + '</span>' +
+              '<span class="weak-bar"><i style="width:' + rate + '%"></i></span>' +
+              '<span class="wv">ミス ' + x.miss + '回 ／ ' + x.att + '打鍵中（' + rate + '%）</span></li>';
+          });
+          html += '</ul>';
+          html += '<p class="note">キーボードの色はミス回数、「次に打つべき文字」を打ち損じた回数で集計してるわ。</p>';
+        }
+        html += '</div>';
+
+        /* --- ミスしたところ（ラウンド別） --- */
+        html += '<div class="d-sec"><h3>ミスしたところ（ラウンド別）</h3>';
+        recs.forEach(function (r) {
+          var rwpm = r.elapsed > 0 && r.typedLen > 0 ? Math.round((r.typedLen / 5) / (r.elapsed / 60)) : 0;
+          html += '<div class="round-rec"><div class="rr-head">' +
+            '<span class="rr-no">R' + r.no + '</span>' +
+            '<span class="rr-res ' + (r.winner === "you" ? "you" : "kag") + '">' + (r.winner === "you" ? "あなたのポイント" : "かがみんのポイント") + '</span>' +
+            '<span>' + r.elapsed.toFixed(1) + '秒</span>' +
+            (rwpm ? '<span>WPM ' + rwpm + '</span>' : '') +
+            (r.miss > 0 ? '<span>ミス ' + r.miss + '回</span>' : '<span class="rr-ok">ミスなし</span>') +
+            '</div>';
+          html += '<div class="rr-jp">' + escHtml(r.jpText) + '</div>';
+          var ro = "";
+          for (var i = 0; i < r.disp.length; i++) {
+            var ch = r.disp.charAt(i);
+            var cnt = r.marks[i] || 0;
+            var cls = cnt ? "mm" : (i >= r.typedLen ? "rest" : "");
+            ro += '<span' + (cls ? ' class="' + cls + '"' : "") + '>' + escHtml(ch === " " ? "␣" : ch) + (cnt > 1 ? "<sup>×" + cnt + "</sup>" : "") + '</span>';
+          }
+          html += '<div class="rr-ro mono">' + ro + '</div></div>';
+        });
+        html += '<p class="note">赤い文字がミスした位置（×2は同じ位置で2回）。薄い文字は、そのラウンドで打ち切れなかった残りよ。</p></div>';
+
+        $("detailBody").innerHTML = html;
       }
 
       /* ================= ボタン ================= */
       $("startBtn").addEventListener("click", function () { beep(880, 0.06, "sine", 0.04); startMatch(); });
       $("rematchBtn").addEventListener("click", function () { startMatch(); });
+      $("detailBtn").addEventListener("click", function () {
+        var p = $("detailPanel");
+        var open = p.hidden;
+        p.hidden = !open;
+        $("detailBtn").textContent = open ? "詳細を閉じる" : "詳細を開く";
+        $("detailBtn").setAttribute("aria-expanded", open ? "true" : "false");
+      });
       $("backBtn").addEventListener("click", function () { showScreen("standby"); });
       $("quitBtn").addEventListener("click", function () {
         clearInterval(state.kagTimer);
