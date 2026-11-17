@@ -1933,13 +1933,13 @@
           if (r.winner === "you") wins++;
         });
         var totalAtt = state.totalKeys + state.totalMiss;
-        var wpm = totalTime > 0 ? (totalTyped / 5) / (totalTime / 60) : 0;
+        var wpm = totalTime > 0 ? totalTyped / (totalTime / 60) : 0;
         var kpsAll = totalTime > 0 ? totalTyped / totalTime : 0;
 
         var html = "";
         /* --- タイピング能力 --- */
         html += '<div class="d-sec"><h3>タイピング能力</h3><div class="d-stats">';
-        html += dStat(totalTime > 0 ? Math.round(wpm) : "―", "WPM（単語/分）");
+        html += dStat(totalTime > 0 ? Math.round(wpm) : "―", "WPM（打鍵/分）");
         html += dStat(totalTime > 0 ? kpsAll.toFixed(1) : "―", "打鍵/秒（全ラウンド）");
         html += dStat(totalAtt, "総打鍵数");
         html += dStat(state.totalMiss, "ミス数");
@@ -1947,7 +1947,7 @@
         html += dStat(state.maxStreak, "最大連続正解");
         html += dStat(wins + " / " + recs.length, "取ったラウンド");
         html += dStat(totalTime.toFixed(1) + "秒", "合計タイム");
-        html += '</div><p class="note">WPMは「正しく打った文字数 ÷ 5 ÷ かかった分数」。e-タイピング等と同じ数え方よ。全ラウンド（負けたラウンドで打った分も含む）で計算してるわ。</p></div>';
+        html += '</div><p class="note">WPMは「正しく打った文字数 ÷ かかった分数」、つまり1分あたりの打鍵数。e-タイピング等と同じ数え方よ。全ラウンド（負けたラウンドで打った分も含む）で計算してるわ。</p></div>';
 
         /* --- 苦手キー --- */
         html += '<div class="d-sec"><h3>苦手キー</h3>';
@@ -1992,7 +1992,7 @@
         /* --- ミスしたところ（ラウンド別） --- */
         html += '<div class="d-sec"><h3>ミスしたところ（ラウンド別）</h3>';
         recs.forEach(function (r) {
-          var rwpm = r.elapsed > 0 && r.typedLen > 0 ? Math.round((r.typedLen / 5) / (r.elapsed / 60)) : 0;
+          var rwpm = r.elapsed > 0 && r.typedLen > 0 ? Math.round(r.typedLen / (r.elapsed / 60)) : 0;
           html += '<div class="round-rec"><div class="rr-head">' +
             '<span class="rr-no">R' + r.no + '</span>' +
             '<span class="rr-res ' + (r.winner === "you" ? "you" : "kag") + '">' + (r.winner === "you" ? "あなたのポイント" : "かがみんのポイント") + '</span>' +
