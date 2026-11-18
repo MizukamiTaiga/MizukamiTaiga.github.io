@@ -296,7 +296,7 @@
         border: 1px solid var(--line); border-radius: 7px; background: var(--bg);
         font-size: 13px; font-weight: 700; color: var(--ink-soft);
       }
-      /* 苦手キーの色はJSがミス回数に比例した濃さでインライン指定する（グラデーション） */
+      /* 苦手キーの色・枠線はJSがミス回数に比例した濃さでインライン指定する（グラデーション） */
       .kb-legend { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 11px; font-weight: 700; color: var(--ink-soft); }
       .kb-legend .grad {
         flex: 1; height: 8px; border-radius: 999px; border: 1px solid var(--line);
@@ -330,6 +330,17 @@
         border: none; border-radius: 14px; background: var(--accent); color: var(--accent-ink);
         font-family: inherit; font-size: 18px; font-weight: 800; padding: 15px; cursor: pointer; box-shadow: var(--shadow);
       }
+
+      /* ---------- footer ---------- */
+      .site-footer {
+        margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line);
+        text-align: center; font-size: 12px; line-height: 1.8; color: var(--ink-soft); font-weight: 500;
+      }
+      .site-footer p { margin: 0 0 6px; }
+      .site-footer a { color: var(--ink-soft); text-decoration: underline; text-underline-offset: 3px; }
+      .site-footer a:hover { color: var(--ink); }
+      .site-footer .visitor-count { margin: 2px 0 8px; }
+      .site-footer .visitor-count img { height: 20px; width: auto; vertical-align: middle; opacity: .9; }
     </style>
   </head>
   <body>
@@ -447,6 +458,12 @@
           <button type="button" class="ghost-btn" id="backBtn">設定を変える（待機画面へ）</button>
         </div>
       </section>
+
+      <footer class="site-footer">
+        <p>※ 本ページに登場する「かがみん」は、『らき☆すた』の柊かがみをモチーフに個人が制作した非公式のファンキャラクターです。本ページは個人のファンメイド作品であり、原作およびその権利者とは一切関係ありません。</p>
+        <p class="visitor-count"><img src="https://hits.sh/mizukamitaiga.github.io/typing/.svg?style=flat-square&amp;label=Visitors&amp;color=156082" alt="Visitors — このページの訪問者数" loading="lazy" /></p>
+        <p><a href="https://mizukamitaiga.github.io/">← Taiga Mizukami のトップページへ戻る</a></p>
+      </footer>
     </div>
 
     <div class="countdown" id="countdown"><div class="num" id="countdownNum">3</div></div>
@@ -1968,7 +1985,7 @@
           function heatStyle(m) {
             if (!m) return "";
             var pct = heatPct(m);
-            return ' style="background:color-mix(in srgb, var(--danger) ' + pct + '%, var(--panel));border-color:var(--danger);color:' + (pct >= 70 ? "#fff" : "var(--ink)") + '"';
+            return ' style="background:color-mix(in srgb, var(--danger) ' + pct + '%, var(--panel));border-color:color-mix(in srgb, var(--danger) ' + pct + '%, var(--line));color:' + (pct >= 70 ? "#fff" : "var(--ink)") + '"';
           }
           var rows = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
           html += '<div class="kb" aria-hidden="true">';
@@ -1996,7 +2013,7 @@
               '<span class="wv">ミス ' + x.miss + '回 ／ ' + x.att + '打鍵中（' + rate + '%）</span></li>';
           });
           html += '</ul>';
-          html += '<p class="note">色の濃さはミス回数に比例してるわ（濃いほど苦手）。「次に打つべき文字」を打ち損じた回数で集計してるわ。</p>';
+          html += '<p class="note">色と枠線の濃さはミス回数に比例してるわ（濃いほど苦手）。「次に打つべき文字」を打ち損じた回数で集計してるわ。</p>';
         }
         html += '</div>';
 
@@ -2046,9 +2063,5 @@
         showScreen("standby");
       });
     </script>
-  <div style="max-width:720px;margin:0 auto;padding:10px 16px 22px;text-align:center;font-size:.78rem;line-height:1.7;color:#8a8f98">
-<p>※ 本ページに登場する「かがみん」は、『らき☆すた』の柊かがみをモチーフに個人が制作した非公式のファンキャラクターです。本ページは個人のファンメイド作品であり、原作およびその権利者とは一切関係ありません。</p>
-<p><a href="../" style="color:#8a8f98">← Taiga Mizukami のトップページへ戻る</a></p>
-</div>
-</body>
+  </body>
 </html>
